@@ -1,9 +1,11 @@
 import { Provider } from '@ethersproject/providers';
 import { CallOverrides, PayableOverrides, Signer } from 'ethers';
 import {
-  ExampleUpgradeableClient,
   ExampleUpgradeable,
   ExampleUpgradeable__factory,
+} from '../typechain';
+import {
+  ExampleUpgradeableClient,
   DeploymentInfo
 } from '..';
 
