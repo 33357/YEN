@@ -3,56 +3,57 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract YEN is ERC20 {
-    struct PerMint {
-        uint256 amount;
-        uint256 mint;
+    struct Block {
+        uint256 personAmount;
+        uint256 mintAmount;
     }
 
-    struct PerBlock {
-        uint32[] list;
-        uint256 index;
+    struct Person {
+        uint32[] blockList;
+        uint256 blockIndex;
     }
 
     uint256 public lastBlock;
-    uint256 public blockMint = 10**18;
+    uint256 public perBlockMintAmount = 10**18;
 
-    mapping(uint256 => PerMint) perMintMap;
-    mapping(address => PerBlock) perBlockMap;
+    mapping(uint256 => Block) blockMap;
+    mapping(address => Person) personMap;
 
     constructor() ERC20("YEN", "YEN") {}
 
-    function getMint() public view returns (uint256) {
-        return (block.timestamp - lastBlock) * blockMint;
+    function getMintAmount() public view returns (uint256) {
+        return (block.timestamp - lastBlock) * perBlockMintAmount;
     }
 
     function mint() external {
         uint32 blockNumber = uint32(block.number);
         if (blockNumber != lastBlock) {
-            perMintMap[blockNumber].mint = getMint();
+            blockMap[blockNumber].mintAmount = getMintAmount();
             lastBlock = blockNumber;
         }
-        PerBlock storage perBlock = perBlockMap[msg.sender];
-        if (perBlock.list.length == perBlock.index) {
-            perBlock.list.push(blockNumber);
+        Person storage person = personMap[msg.sender];
+        if (person.blockList.length == person.blockIndex) {
+            person.blockList.push(blockNumber);
         } else {
-            perBlock.list[perBlock.index] = blockNumber;
+            person.blockList[person.blockIndex] = blockNumber;
         }
         unchecked {
-            perMintMap[blockNumber].amount++;
-            perBlock.index++;
+            blockMap[blockNumber].personAmount++;
+            person.blockIndex++;
         }
     }
 
     function claim() external {
-        PerBlock memory perBlock = perBlockMap[msg.sender];
-        require(perBlock.list[perBlock.index - 1] != block.number, "sample block!");
+        Person memory person = personMap[msg.sender];
+        require(person.blockList[person.blockIndex - 1] != block.number, "mint claim cannot in sample block!");
         uint256 amount;
         unchecked {
-            for (uint256 i = 0; i < perBlock.index; i++) {
-                amount += perMintMap[perBlock.list[i]].mint / perMintMap[perBlock.list[i]].amount;
+            for (uint256 i = 0; i < person.blockIndex; i++) {
+                Block memory _block = blockMap[person.blockList[i]];
+                amount += _block.mintAmount / _block.personAmount;
             }
         }
-        perBlockMap[msg.sender].index = 0;
+        personMap[msg.sender].blockIndex = 0;
         _mint(msg.sender, amount);
     }
 }
