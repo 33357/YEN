@@ -7,8 +7,8 @@ import "./interfaces/IUniswapV2Pair.sol";
 contract YEN is ERC20 {
     event Mint(address indexed person, uint256 personIndex);
     event Claim(address indexed person, uint256 claimAmount);
-    event StakeLP(address indexed person, uint256 stakeAmount);
-    event WithdrawLP(address indexed person, uint256 withdrawAmount);
+    event Stake(address indexed person, uint256 stakeAmount);
+    event WithdrawStake(address indexed person, uint256 withdrawAmount);
     event WithdrawReward(address indexed person, uint256 rewardAmount);
 
     struct Block {
@@ -139,19 +139,19 @@ contract YEN is ERC20 {
         emit Claim(msg.sender, claimAmount);
     }
 
-    function stakeLP(uint256 stakeAmount) external _RewardCheck(msg.sender) {
+    function stake(uint256 stakeAmount) external _RewardCheck(msg.sender) {
         pair.transferFrom(msg.sender, address(this), stakeAmount);
         personMap[msg.sender].stakeAmount += stakeAmount;
         stakeBalance += stakeAmount;
-        emit StakeLP(msg.sender, stakeAmount);
+        emit Stake(msg.sender, stakeAmount);
     }
 
-    function withdrawLP(uint256 withdrawAmount) public _RewardCheck(msg.sender) {
+    function withdrawStake(uint256 withdrawAmount) public _RewardCheck(msg.sender) {
         require(withdrawAmount <= personMap[msg.sender].stakeAmount, "withdrawAmount cannot over stakeAmount!");
         personMap[msg.sender].stakeAmount -= withdrawAmount;
         stakeBalance -= withdrawAmount;
         pair.transfer(msg.sender, withdrawAmount);
-        emit WithdrawLP(msg.sender, withdrawAmount);
+        emit WithdrawStake(msg.sender, withdrawAmount);
     }
 
     function withdrawReward() public _RewardCheck(msg.sender) {
@@ -163,7 +163,7 @@ contract YEN is ERC20 {
     }
 
     function exit() external {
-        withdrawLP(personMap[msg.sender].stakeAmount);
+        withdrawStake(personMap[msg.sender].stakeAmount);
         withdrawReward();
     }
 }
