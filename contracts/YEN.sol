@@ -19,8 +19,8 @@ contract YEN is ERC20 {
         uint32[] blockList;
         uint256 blockIndex;
         uint256 stakeAmount;
-        uint256 reward;
-        uint256 perStakeRewardStored;
+        uint256 rewardStored;
+        uint256 lastPerStakeReward;
     }
 
     uint256 public lastBlock;
@@ -59,10 +59,10 @@ contract YEN is ERC20 {
         _;
     }
 
-    modifier _RewardCheck(address person) {
-        if (personMap[person].perStakeRewardStored != perStakeReward) {
-            personMap[person].reward = getStakeReward(person);
-            personMap[person].perStakeRewardStored = perStakeReward;
+    modifier _rewardCheck(address person) {
+        if (personMap[person].lastPerStakeReward != perStakeReward) {
+            personMap[person].rewardStored = getStakeReward(person);
+            personMap[person].lastPerStakeReward = perStakeReward;
         }
         _;
     }
@@ -97,8 +97,8 @@ contract YEN is ERC20 {
         unchecked {
             return
                 personMap[person].stakeAmount *
-                (perStakeReward - personMap[person].perStakeRewardStored) +
-                personMap[person].reward;
+                (perStakeReward - personMap[person].lastPerStakeReward) +
+                personMap[person].rewardStored;
         }
     }
 
@@ -139,14 +139,14 @@ contract YEN is ERC20 {
         emit Claim(msg.sender, claimAmount);
     }
 
-    function stake(uint256 stakeAmount) external _RewardCheck(msg.sender) {
+    function stake(uint256 stakeAmount) external _rewardCheck(msg.sender) {
         pair.transferFrom(msg.sender, address(this), stakeAmount);
         personMap[msg.sender].stakeAmount += stakeAmount;
         stakeBalance += stakeAmount;
         emit Stake(msg.sender, stakeAmount);
     }
 
-    function withdrawStake(uint256 withdrawAmount) public _RewardCheck(msg.sender) {
+    function withdrawStake(uint256 withdrawAmount) public _rewardCheck(msg.sender) {
         require(withdrawAmount <= personMap[msg.sender].stakeAmount, "withdrawAmount cannot over stakeAmount!");
         personMap[msg.sender].stakeAmount -= withdrawAmount;
         stakeBalance -= withdrawAmount;
@@ -154,10 +154,9 @@ contract YEN is ERC20 {
         emit WithdrawStake(msg.sender, withdrawAmount);
     }
 
-    function withdrawReward() public _RewardCheck(msg.sender) {
-        uint256 rewardAmount = getStakeReward(msg.sender);
-        personMap[msg.sender].perStakeRewardStored = perStakeReward;
-        personMap[msg.sender].reward = 0;
+    function withdrawReward() public _rewardCheck(msg.sender) {
+        uint256 rewardAmount = personMap[msg.sender].rewardStored;
+        personMap[msg.sender].rewardStored = 0;
         _mint(msg.sender, rewardAmount);
         emit WithdrawReward(msg.sender, rewardAmount);
     }
