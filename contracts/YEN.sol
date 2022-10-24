@@ -28,27 +28,27 @@ contract YEN is ERC20 {
         uint256 getAmount;
     }
 
+    uint256 public constant halvingBlockAmount = (60 * 60 * 24 * 30) / 12;
     uint256 public lastBlock;
     uint256 public halvingBlock;
-    uint256 public blockMintAmount = 50 * 10**18;
-    uint256 public halvingBlockAmount = (60 * 60 * 24 * 30) / 12;
+    uint256 public blockMintAmount = 100 * 10**18;
 
     uint256 public perStakeReward;
     uint256 public stakeBalance;
 
-    uint256 public sellEndBlock;
-    uint256 public sellBlockAmount = (60 * 60 * 24 * 3) / 12;
-    uint256 public sellAmount = 6800000 * 10**18;
+    uint256 public constant sellBlockAmount = (60 * 60 * 24 * 3) / 12;
+    uint256 public constant sellAmount = 6800000 * 10**18;
+    uint256 public constant getMintBlockAmount = (60 * 60 * 24 * 100) / 12;
+    uint256 public immutable sellEndBlock;
     uint256 public sellETHAmount;
     uint256 public sellPairAmount;
-    uint256 public getMintBlockAmount = (60 * 60 * 24 * 100) / 12;
     uint256 public mintStartBlock;
 
-    uint256 public fee = 1;
-    uint256 public feeBase = 1000;
+    uint256 public constant fee = 1;
+    uint256 public constant feeBase = 1000;
 
-    IUniswapV2Pair public pair;
-    IWETH public weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    IUniswapV2Pair public immutable pair;
 
     mapping(uint256 => Block) blockMap;
     mapping(address => Person) personMap;
@@ -129,7 +129,7 @@ contract YEN is ERC20 {
 
     function getMintAmount() public view returns (uint256) {
         unchecked {
-            return (block.number - lastBlock) * blockMintAmount;
+            return (block.number - lastBlock) * blockMintAmount / 2;
         }
     }
 
