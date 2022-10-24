@@ -37,11 +37,12 @@ contract YEN is ERC20 {
     uint256 public stakeBalance;
 
     uint256 public sellEndBlock;
-    uint256 public sellBlock = (60 * 60 * 24 * 3) / 12;
+    uint256 public sellBlockAmount = (60 * 60 * 24 * 3) / 12;
     uint256 public sellAmount = 6800000 * 10**18;
     uint256 public sellETHAmount;
     uint256 public sellPairAmount;
-    bool public sellEnd;
+    uint256 public getMintBlockAmount = (60 * 60 * 24 * 100) / 12;
+    uint256 public mintStartBlock;
 
     uint256 public fee = 1;
     uint256 public feeBase = 1000;
@@ -54,7 +55,7 @@ contract YEN is ERC20 {
     mapping(address => Buyer) buyerMap;
 
     constructor() ERC20("YEN", "YEN") {
-        sellEndBlock = block.number + sellBlock;
+        sellEndBlock = block.number + sellBlockAmount;
         pair = IUniswapV2Pair(
             IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(address(weth), address(this))
         );
@@ -62,7 +63,7 @@ contract YEN is ERC20 {
 
     /* ================ UTIL FUNCTIONS ================ */
 
-    modifier _halvingCheck() {
+    modifier _checkHalving() {
         unchecked {
             if (block.number >= halvingBlock) {
                 blockMintAmount /= 2;
@@ -72,7 +73,7 @@ contract YEN is ERC20 {
         _;
     }
 
-    modifier _rewardCheck(address person) {
+    modifier _checkReward(address person) {
         if (personMap[person].lastPerStakeReward != perStakeReward) {
             personMap[person].rewardStored = getStakeReward(person);
             personMap[person].lastPerStakeReward = perStakeReward;
@@ -80,8 +81,8 @@ contract YEN is ERC20 {
         _;
     }
 
-    modifier _sellEndCheck() {
-        require(sellEnd, "sell must end!");
+    modifier _checkMintStart() {
+        require(mintStartBlock != 0, "mint must start!");
         _;
     }
 
@@ -115,7 +116,14 @@ contract YEN is ERC20 {
 
     function getSellAmount(address buyer) public view returns (uint256) {
         unchecked {
-            return (sellPairAmount * buyerMap[buyer].buyEthAmount) / sellETHAmount - buyerMap[buyer].getAmount;
+            uint256 percent = ((block.number - mintStartBlock) * 100) / getMintBlockAmount;
+            if (percent > 100) {
+                percent = 100;
+            }
+            return
+                (((sellPairAmount * buyerMap[buyer].buyEthAmount) / sellETHAmount) * percent) /
+                100 -
+                buyerMap[buyer].getAmount;
         }
     }
 
@@ -144,24 +152,24 @@ contract YEN is ERC20 {
 
     function endSell() external {
         require(block.number >= sellEndBlock, "block must over sellEndBlock!");
-        require(!sellEnd, "sell must open!");
+        require(mintStartBlock == 0, "mint cannot start!");
         weth.deposit{value: sellETHAmount}();
         weth.transfer(address(pair), sellETHAmount);
         _mint(address(pair), sellAmount);
         sellPairAmount = pair.mint(address(this));
-        sellEnd = true;
+        mintStartBlock = block.number;
         halvingBlock = block.number + halvingBlockAmount;
         lastBlock = block.number;
     }
 
-    function getSell(uint256 getAmount) external _sellEndCheck {
+    function getSell(uint256 getAmount) external _checkMintStart {
         uint256 maxGetAmount = getSellAmount(msg.sender);
         require(getAmount <= maxGetAmount, "cannot over maxGetAmount!");
         buyerMap[msg.sender].getAmount += getAmount;
         pair.transfer(msg.sender, getAmount);
     }
 
-    function mint() external _sellEndCheck _halvingCheck {
+    function mint() external _checkMintStart _checkHalving {
         uint32 blockNumber = uint32(block.number);
         if (blockNumber != lastBlock) {
             blockMap[blockNumber].mintAmount = uint128(getMintAmount());
@@ -181,7 +189,7 @@ contract YEN is ERC20 {
         }
     }
 
-    function claim() external _sellEndCheck {
+    function claim() external _checkMintStart {
         Person memory person = personMap[msg.sender];
         require(person.blockList[person.blockIndex - 1] != block.number, "mint claim cannot in sample block!");
         uint256 claimAmount;
@@ -196,14 +204,14 @@ contract YEN is ERC20 {
         emit Claim(msg.sender, claimAmount);
     }
 
-    function stake(uint256 stakeAmount) external _sellEndCheck _rewardCheck(msg.sender) {
+    function stake(uint256 stakeAmount) external _checkMintStart _checkReward(msg.sender) {
         pair.transferFrom(msg.sender, address(this), stakeAmount);
         personMap[msg.sender].stakeAmount += stakeAmount;
         stakeBalance += stakeAmount;
         emit Stake(msg.sender, stakeAmount);
     }
 
-    function withdrawStake(uint256 withdrawAmount) public _sellEndCheck _rewardCheck(msg.sender) {
+    function withdrawStake(uint256 withdrawAmount) public _checkMintStart _checkReward(msg.sender) {
         require(withdrawAmount <= personMap[msg.sender].stakeAmount, "withdrawAmount cannot over stakeAmount!");
         personMap[msg.sender].stakeAmount -= withdrawAmount;
         stakeBalance -= withdrawAmount;
@@ -211,7 +219,7 @@ contract YEN is ERC20 {
         emit WithdrawStake(msg.sender, withdrawAmount);
     }
 
-    function withdrawReward() public _sellEndCheck _rewardCheck(msg.sender) {
+    function withdrawReward() public _checkMintStart _checkReward(msg.sender) {
         uint256 rewardAmount = personMap[msg.sender].rewardStored;
         personMap[msg.sender].rewardStored = 0;
         _mint(msg.sender, rewardAmount);
