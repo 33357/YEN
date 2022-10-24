@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./libs/ERC20.sol";
 import "./interfaces/IUniswapFactory.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IWETH.sol";
@@ -43,6 +43,9 @@ contract YEN is ERC20 {
     uint256 public sellPairAmount;
     bool public sellEnd;
 
+    uint256 public fee = 1;
+    uint256 public feeBase = 1000;
+
     IUniswapV2Pair public pair;
     IWETH public weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
@@ -82,23 +85,31 @@ contract YEN is ERC20 {
         _;
     }
 
-    // function _transfer(
-    //     address sender,
-    //     address recipient,
-    //     uint256 amount
-    // ) internal override {
-    //     require(sender != address(0), "ERC20: transfer from the zero address");
-    //     require(recipient != address(0), "ERC20: transfer to the zero address");
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal override {
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
 
-    //     uint256 senderBalance = this._balances[sender];
-    //     require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
-    //     unchecked {
-    //         super._balances[sender] = senderBalance - amount;
-    //     }
-    //     super._balances[recipient] += amount;
+        _beforeTokenTransfer(sender, recipient, amount);
 
-    //     emit Transfer(sender, recipient, amount);
-    // }
+        uint256 senderBalance = _balances[sender];
+        require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
+        unchecked {
+            _balances[sender] = senderBalance - amount;
+        }
+
+        uint256 feeAmount = (amount * fee) / feeBase;
+        perStakeReward += feeAmount / stakeBalance;
+        uint256 getAmount = amount - feeAmount;
+        _balances[recipient] += getAmount;
+
+        emit Transfer(sender, recipient, getAmount);
+
+        _afterTokenTransfer(sender, recipient, amount);
+    }
 
     /* ================ VIEW FUNCTIONS ================ */
 
@@ -145,7 +156,7 @@ contract YEN is ERC20 {
 
     function getSell(uint256 getAmount) external _sellEndCheck {
         uint256 maxGetAmount = getSellAmount(msg.sender);
-        require(getAmount <= maxGetAmount ,"cannot over maxGetAmount!");
+        require(getAmount <= maxGetAmount, "cannot over maxGetAmount!");
         buyerMap[msg.sender].getAmount += getAmount;
         pair.transfer(msg.sender, getAmount);
     }

@@ -11,6 +11,4 @@ interface IUniswapV2Pair {
     ) external returns (bool);
 
     function mint(address to) external returns (uint256 liquidity);
-
-    function sync() external;
 }
