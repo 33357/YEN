@@ -39,7 +39,7 @@ contract YEN is ERC20 {
     uint256 public constant sellBlockAmount = (60 * 60 * 24 * 3) / 12;
     uint256 public constant sellAmount = 6800000 * 10**18;
     uint256 public constant getMintBlockAmount = (60 * 60 * 24 * 100) / 12;
-    uint256 public immutable sellEndBlock;
+    uint256 public immutable sellEndBlock = block.number + sellBlockAmount;
     uint256 public sellETHAmount;
     uint256 public sellPairAmount;
     uint256 public mintStartBlock;
@@ -48,18 +48,17 @@ contract YEN is ERC20 {
     uint256 public constant feeBase = 1000;
 
     IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
-    IUniswapV2Pair public immutable pair;
+    IERC20 public immutable token = IERC20(address(this));
+    IUniswapV2Pair public immutable pair =
+        IUniswapV2Pair(
+            IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(address(weth), address(this))
+        );
 
     mapping(uint256 => Block) blockMap;
     mapping(address => Person) personMap;
     mapping(address => Buyer) buyerMap;
 
-    constructor() ERC20("YEN", "YEN") {
-        sellEndBlock = block.number + sellBlockAmount;
-        pair = IUniswapV2Pair(
-            IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(address(weth), address(this))
-        );
-    }
+    constructor() ERC20("YEN", "YEN") {}
 
     /* ================ UTIL FUNCTIONS ================ */
 
@@ -103,10 +102,12 @@ contract YEN is ERC20 {
         }
 
         uint256 feeAmount = (amount * fee) / feeBase;
+        _balances[address(this)] += feeAmount;
         perStakeReward += feeAmount / stakeBalance;
         uint256 getAmount = amount - feeAmount;
         _balances[recipient] += getAmount;
 
+        emit Transfer(sender, address(this), feeAmount);
         emit Transfer(sender, recipient, getAmount);
 
         _afterTokenTransfer(sender, recipient, amount);
@@ -129,7 +130,7 @@ contract YEN is ERC20 {
 
     function getMintAmount() public view returns (uint256) {
         unchecked {
-            return (block.number - lastBlock) * blockMintAmount / 2;
+            return (block.number - lastBlock) * blockMintAmount;
         }
     }
 
@@ -172,7 +173,9 @@ contract YEN is ERC20 {
     function mint() external _checkMintStart _checkHalving {
         uint32 blockNumber = uint32(block.number);
         if (blockNumber != lastBlock) {
-            blockMap[blockNumber].mintAmount = uint128(getMintAmount());
+            uint256 mintAmount = getMintAmount();
+            _mint(address(this), mintAmount);
+            blockMap[blockNumber].mintAmount = uint128(mintAmount / 2);
             lastBlock = blockNumber;
             perStakeReward += blockMap[blockNumber].mintAmount / stakeBalance;
         }
@@ -200,7 +203,7 @@ contract YEN is ERC20 {
             }
         }
         personMap[msg.sender].blockIndex = 0;
-        _mint(msg.sender, claimAmount);
+        token.transfer(msg.sender, claimAmount);
         emit Claim(msg.sender, claimAmount);
     }
 
@@ -222,7 +225,7 @@ contract YEN is ERC20 {
     function withdrawReward() public _checkMintStart _checkReward(msg.sender) {
         uint256 rewardAmount = personMap[msg.sender].rewardStored;
         personMap[msg.sender].rewardStored = 0;
-        _mint(msg.sender, rewardAmount);
+        token.transfer(msg.sender, rewardAmount);
         emit WithdrawReward(msg.sender, rewardAmount);
     }
 
