@@ -38,7 +38,7 @@ contract YEN is ERC20 {
     uint256 public blockMintAmount = 100 * 10**18;
     uint256 public mintStartBlock;
 
-    uint256 public stakeAmount = 1; 
+    uint256 public stakeAmount = 1;
     uint256 public perStakeRewardAmount;
 
     uint256 public constant shareBlockAmount = (60 * 60 * 24 * 3) / 12;
@@ -47,7 +47,7 @@ contract YEN is ERC20 {
     uint256 public immutable shareEndBlock = block.number + shareBlockAmount;
     uint256 public shareEthAmount;
     uint256 public sharePairAmount;
-   
+
     uint256 public constant fee = 1;
 
     IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);

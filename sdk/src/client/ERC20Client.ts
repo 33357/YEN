@@ -2,12 +2,6 @@ import { BigNumber, CallOverrides, PayableOverrides, Signer } from 'ethers';
 import { Provider } from '@ethersproject/providers';
 
 export interface ERC20Client {
-  connect(
-    provider: Provider | Signer,
-    address: string,
-    waitConfirmations?: number
-  ): Promise<void>;
-
   address(): string;
 
   /* ================ VIEW FUNCTIONS ================ */

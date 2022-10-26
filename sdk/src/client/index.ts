@@ -1,7 +1,5 @@
-export * from './ExampleUpgradeableClient';
-export * from './ExampleClient';
+export * from './YENClient';
 export * from './ERC20Client';
 
-export * from './EtherExampleClient';
-export * from './EtherExampleUpgradeableClient';
+export * from './EtherYENClient';
 export * from './EtherERC20Client';
