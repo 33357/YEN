@@ -53,14 +53,10 @@ export GAS_PRICE=30
 
 #### deploy script
 ```bash
-yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:deploy --contract Example --gas-price $GAS_PRICE --args [] --network $NETWORK_ID --wait-num $WAIT_NUM
-
-yarn run env-cmd -f $ENV_FILE yarn run hardhat upgradeableContract:deploy --contract ExampleUpgradeable --gas-price $GAS_PRICE ---args [] -wait-num $WAIT_NUM --network $NETWORK_ID
+yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:deploy --contract YEN --gas-price $GAS_PRICE --args [] --network $NETWORK_ID --wait-num $WAIT_NUM
 ```
 
 #### verify contract
 ```bash
-yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract Example --network $NETWORK_ID
-
-yarn run env-cmd -f $ENV_FILE yarn run hardhat upgradeableContract:verify --contract ExampleUpgradeable --network $NETWORK_ID
+yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract YEN --network $NETWORK_ID
 ```
