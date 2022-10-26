@@ -21,15 +21,15 @@ contract YEN is ERC20 {
 
     struct Person {
         uint32[] blockList;
-        uint256 blockIndex;
-        uint256 stakeAmount;
-        uint256 rewardAmount;
-        uint256 lastPerStakeRewardAmount;
+        uint128 blockIndex;
+        uint128 stakeAmount;
+        uint128 rewardAmount;
+        uint128 lastPerStakeRewardAmount;
     }
 
     struct Sharer {
-        uint256 shareAmount;
-        uint256 getAmount;
+        uint128 shareAmount;
+        uint128 getAmount;
     }
 
     uint256 public constant halvingBlockAmount = (60 * 60 * 24 * 30) / 12;
@@ -77,8 +77,8 @@ contract YEN is ERC20 {
 
     modifier _checkReward() {
         if (personMap[msg.sender].lastPerStakeRewardAmount != perStakeRewardAmount) {
-            personMap[msg.sender].rewardAmount = getRewardAmount(msg.sender);
-            personMap[msg.sender].lastPerStakeRewardAmount = perStakeRewardAmount;
+            personMap[msg.sender].rewardAmount = uint128(getRewardAmount(msg.sender));
+            personMap[msg.sender].lastPerStakeRewardAmount = uint128(perStakeRewardAmount);
         }
         _;
     }
@@ -158,7 +158,7 @@ contract YEN is ERC20 {
 
     function share() external payable {
         require(block.number < shareEndBlock, "block cannot over shareEndBlock!");
-        sharerMap[msg.sender].shareAmount += msg.value;
+        sharerMap[msg.sender].shareAmount += uint128(msg.value);
         shareEthAmount += msg.value;
         emit Share(msg.sender, msg.value);
     }
@@ -178,7 +178,7 @@ contract YEN is ERC20 {
     function get(uint256 amount) external _checkMintStart {
         uint256 maxAmount = maxGetAmount(msg.sender);
         require(amount <= maxAmount, "cannot over maxAmount!");
-        sharerMap[msg.sender].getAmount += amount;
+        sharerMap[msg.sender].getAmount += uint128(amount);
         pair.transfer(msg.sender, amount);
         emit Get(msg.sender, amount);
     }
@@ -221,14 +221,14 @@ contract YEN is ERC20 {
 
     function stake(uint256 amount) external _checkMintStart _checkReward {
         pair.transferFrom(msg.sender, address(this), amount);
-        personMap[msg.sender].stakeAmount += amount;
+        personMap[msg.sender].stakeAmount += uint128(amount);
         stakeAmount += amount;
         emit Stake(msg.sender, amount);
     }
 
     function withdrawStake(uint256 amount) public _checkMintStart _checkReward {
         require(amount <= personMap[msg.sender].stakeAmount, "amount cannot over stakeAmount!");
-        personMap[msg.sender].stakeAmount -= amount;
+        personMap[msg.sender].stakeAmount -= uint128(amount);
         stakeAmount -= amount;
         pair.transfer(msg.sender, amount);
         emit WithdrawStake(msg.sender, amount);
