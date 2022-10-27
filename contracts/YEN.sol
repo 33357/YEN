@@ -48,7 +48,9 @@ contract YEN is ERC20 {
     uint256 public shareEthAmount;
     uint256 public sharePairAmount;
 
-    uint256 public constant fee = 1;
+    uint256 public constant stakerFee = 5;
+    uint256 public constant funderFee = 5;
+    address public funder = msg.sender;
 
     IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     IERC20 public immutable token = IERC20(address(this));
@@ -108,16 +110,18 @@ contract YEN is ERC20 {
             _balances[sender] = senderBalance - amount;
         }
 
-        uint256 feeAmount;
+        uint256 stakerFeeAmount;
+        uint256 funderFeeAmount;
         if (sender != address(this)) {
-            feeAmount = (amount * fee) / 1000;
+            stakerFeeAmount = (amount * stakerFee) / 10000;
+            funderFeeAmount = (amount * funderFee) / 10000;
+            _balances[address(this)] += stakerFeeAmount;
+            _addPerStakeRewardAmount(stakerFeeAmount);
+            emit Transfer(sender, address(this), stakerFeeAmount);
+            _balances[funder] += funderFeeAmount;
+            emit Transfer(sender, funder, funderFeeAmount);
         }
-        if (feeAmount != 0) {
-            _balances[address(this)] += feeAmount;
-            _addPerStakeRewardAmount(feeAmount);
-            emit Transfer(sender, address(this), feeAmount);
-        }
-        uint256 getAmount = amount - feeAmount;
+        uint256 getAmount = amount - funderFeeAmount - stakerFeeAmount;
         _balances[recipient] += getAmount;
         emit Transfer(sender, recipient, getAmount);
 
@@ -252,5 +256,10 @@ contract YEN is ERC20 {
     function exit() external {
         withdrawStake(personMap[msg.sender].stakeAmount);
         withdrawReward();
+    }
+
+    function setFunder(address newFunder) external {
+        require(msg.sender == funder,"sender not funder!");
+        funder = newFunder;
     }
 }
