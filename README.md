@@ -52,7 +52,7 @@ yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:deploy --contract TESTYE
 
 #### verify contract
 ```bash
-yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract YEN --network $NETWORK_ID
+yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract YEN --network $NETWORK_ID --args []
 
-yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract TESTYEN --network $NETWORK_ID
+yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract TESTYEN --network $NETWORK_ID --args []
 ```
