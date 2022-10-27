@@ -56,15 +56,15 @@ const config: HardhatUserConfig = {
         .toNumber(),
     },
     1: {
-      url: `https://mainnet.infura.io/v3/${process.env.MAINNET_INFURA}`,
+      url: `https://mainnet.infura.io/v3/${process.env.INFURA}`,
       accounts,
       timeout: 60000,
       gasPrice: BigNumber.from(gasPrice)
         .mul(10 ** 9)
         .toNumber(),
     },
-    4: {
-      url: `https://rinkeby.infura.io/v3/${process.env.RINKEBY_INFURA}`,
+    5: {
+      url: `https://goerli.infura.io/v3/${process.env.INFURA}`,
       accounts,
       timeout: 60000,
       gasPrice: BigNumber.from(gasPrice)

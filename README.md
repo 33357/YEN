@@ -24,26 +24,18 @@ yarn test:cov
 ## SOP
 ### environment
 #### localhost 
-``` bash
-yarn localhost
 
-export ENV_FILE='./envs/env.localhost'
-export NETWORK='localhost'
-export WAIT_NUM=1
-export GAS_PRICE=1
-```
-
-#### rinkeby
+#### goerli
 ``` bash
-export ENV_FILE='./envs/env.rinkeby'
-export NETWORK_ID=4
+export ENV_FILE='./envs/goerli.env'
+export NETWORK_ID=5
 export WAIT_NUM=1
-export GAS_PRICE=3
+export GAS_PRICE=45
 ```
 
 #### eth
 ``` bash
-export ENV_FILE='./envs/env.eth'
+export ENV_FILE='./envs/eth.env'
 export NETWORK_ID=1
 export WAIT_NUM=3
 export GAS_PRICE=30
@@ -54,9 +46,13 @@ export GAS_PRICE=30
 #### deploy script
 ```bash
 yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:deploy --contract YEN --gas-price $GAS_PRICE --args [] --network $NETWORK_ID --wait-num $WAIT_NUM
+
+yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:deploy --contract TESTYEN --gas-price $GAS_PRICE --args [] --network $NETWORK_ID --wait-num $WAIT_NUM
 ```
 
 #### verify contract
 ```bash
 yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract YEN --network $NETWORK_ID
+
+yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract TESTYEN --network $NETWORK_ID
 ```

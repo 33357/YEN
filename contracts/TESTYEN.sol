@@ -5,7 +5,7 @@ import "./interfaces/IUniswapFactory.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IWETH.sol";
 
-contract YEN is ERC20 {
+contract TESTYEN is ERC20 {
     event Share(address indexed person, uint256 amount);
     event Get(address indexed person, uint256 amount);
     event Mint(address indexed person, uint256 index);
@@ -14,7 +14,7 @@ contract YEN is ERC20 {
     event WithdrawStake(address indexed person, uint256 amount);
     event WithdrawReward(address indexed person, uint256 amount);
 
-    struct Block {
+    struct Block { 
         uint128 personAmount;
         uint128 mintAmount;
     }
@@ -32,7 +32,7 @@ contract YEN is ERC20 {
         uint128 getAmount;
     }
 
-    uint256 public constant halvingBlockAmount = ((60 * 60 * 24) / 12) * 30;
+    uint256 public constant halvingBlockAmount = ((60 * 60 * 24) / 12) * 1;
     uint256 public lastBlock;
     uint256 public halvingBlock;
     uint256 public blockMintAmount = 100 * 10**18;
@@ -41,16 +41,16 @@ contract YEN is ERC20 {
     uint256 public stakeAmount = 1;
     uint256 public perStakeRewardAmount;
 
-    uint256 public constant shareBlockAmount = ((60 * 60 * 24) / 12) * 3;
+    uint256 public constant shareBlockAmount = ((60 * 60 * 24) / 12) * 1;
     uint256 public constant shareTokenAmount = 6800000 * 10**18;
-    uint256 public constant getBlockAmount = ((60 * 60 * 24) / 12) * 100;
+    uint256 public constant getBlockAmount = ((60 * 60 * 24) / 12) * 5;
     uint256 public immutable shareEndBlock = block.number + shareBlockAmount;
     uint256 public shareEthAmount;
     uint256 public sharePairAmount;
 
     uint256 public constant fee = 1;
 
-    IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    IWETH public constant weth = IWETH(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6);
     IERC20 public immutable token = IERC20(address(this));
     IUniswapV2Pair public immutable pair =
         IUniswapV2Pair(
