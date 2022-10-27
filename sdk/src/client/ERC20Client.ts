@@ -1,48 +1,133 @@
-import { BigNumber, CallOverrides, PayableOverrides, Signer } from 'ethers';
 import { Provider } from '@ethersproject/providers';
+import {
+  BigNumber,
+  CallOverrides,
+  ContractTransaction,
+  PayableOverrides,
+  Signer
+} from 'ethers';
+import { IERC20Client } from '..';
+import { ERC20, ERC20__factory } from '../typechain';
 
-export interface ERC20Client {
-  address(): string;
+export class ERC20Client implements IERC20Client {
+  private _erc20: ERC20;
+  protected _provider: Provider | Signer;
+  protected _waitConfirmations = 1;
+  protected _errorTitle = 'ERC20Client';
+
+  constructor(
+    provider: Provider | Signer,
+    address: string,
+    waitConfirmations?: number
+  ) {
+    this._erc20 = ERC20__factory.connect(address, provider);
+    if (waitConfirmations) {
+      this._waitConfirmations = waitConfirmations;
+    }
+    this._provider = provider;
+  }
+
+  public address(): string {
+    return this._erc20.address;
+  }
+
+  /* ================ UTILS FUNCTIONS ================ */
+
+  private _beforeTransaction() {
+    if (this._provider instanceof Provider) {
+      throw `${this._errorTitle}: no singer`;
+    }
+  }
+
+  private async _afterTransaction(
+    transaction: ContractTransaction,
+    callback?: Function
+  ): Promise<any> {
+    if (callback) {
+      callback(transaction);
+    }
+    const receipt = await transaction.wait(this._waitConfirmations);
+    if (callback) {
+      callback(receipt);
+    }
+  }
 
   /* ================ VIEW FUNCTIONS ================ */
 
-  name(config?: CallOverrides): Promise<string>;
+  public async name(config?: CallOverrides): Promise<string> {
+    return this._erc20.name({ ...config });
+  }
 
-  symbol(config?: CallOverrides): Promise<string>;
+  public async symbol(config?: CallOverrides): Promise<string> {
+    return this._erc20.symbol({ ...config });
+  }
 
-  decimals(config?: CallOverrides): Promise<number>;
+  public async decimals(config?: CallOverrides): Promise<number> {
+    return this._erc20.decimals({ ...config });
+  }
 
-  totalSupply(config?: CallOverrides): Promise<BigNumber>;
+  public async totalSupply(config?: CallOverrides): Promise<BigNumber> {
+    return this._erc20.totalSupply({ ...config });
+  }
 
-  balanceOf(account: string, config?: CallOverrides): Promise<BigNumber>;
+  public async balanceOf(
+    account: string,
+    config?: CallOverrides
+  ): Promise<BigNumber> {
+    return this._erc20.balanceOf(account, { ...config });
+  }
 
-  allowance(
+  public async allowance(
     owner: string,
     spender: string,
     config?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<BigNumber> {
+    return this._erc20.allowance(owner, spender, { ...config });
+  }
 
   /* ================ TRANSACTION FUNCTIONS ================ */
 
-  transfer(
+  public async transfer(
     recipient: string,
     amount: BigNumber,
     config?: PayableOverrides,
     callback?: Function
-  ): Promise<void>;
+  ): Promise<void> {
+    this._beforeTransaction();
+    const transaction = await this._erc20
+      .connect(this._provider)
+      .transfer(recipient, amount, {
+        ...config
+      });
+    this._afterTransaction(transaction, callback);
+  }
 
-  approve(
+  public async approve(
     spender: string,
     amount: BigNumber,
     config?: PayableOverrides,
     callback?: Function
-  ): Promise<void>;
+  ): Promise<void> {
+    this._beforeTransaction();
+    const transaction = await this._erc20
+      .connect(this._provider)
+      .approve(spender, amount, { ...config });
+    this._afterTransaction(transaction, callback);
+  }
 
-  transferFrom(
+  public async transferFrom(
     sender: string,
     recipient: string,
     amount: BigNumber,
     config?: PayableOverrides,
     callback?: Function
-  ): Promise<void>;
+  ): Promise<void> {
+    this._beforeTransaction();
+    const transaction = await this._erc20
+      .connect(this._provider)
+      .transferFrom(sender, recipient, amount, {
+        ...config
+      });
+    this._afterTransaction(transaction, callback);
+  }
 }

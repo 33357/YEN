@@ -57,9 +57,9 @@ contract YEN is ERC20 {
             IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(address(weth), address(this))
         );
 
-    mapping(uint256 => Block) blockMap;
-    mapping(address => Person) personMap;
-    mapping(address => Sharer) sharerMap;
+    mapping(uint256 => Block) public blockMap;
+    mapping(address => Person) public personMap;
+    mapping(address => Sharer) public sharerMap;
 
     constructor() ERC20("YEN", "YEN") {}
 
@@ -152,6 +152,14 @@ contract YEN is ERC20 {
                 (perStakeRewardAmount - personMap[person].lastPerStakeRewardAmount) +
                 personMap[person].rewardAmount;
         }
+    }
+
+    function getPersonBlockList(address person) external view returns (uint32[] memory) {
+        uint32[] memory blockList = new uint32[](personMap[person].blockIndex);
+        for (uint256 i = 0; i < personMap[person].blockIndex; i++) {
+            blockList[i] = personMap[person].blockList[i];
+        }
+        return blockList;
     }
 
     /* ================ TRANSACTION FUNCTIONS ================ */
