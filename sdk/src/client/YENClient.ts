@@ -60,8 +60,16 @@ export class YENClient implements IYENClient {
     return this._contract.blockMintAmount({ ...config });
   }
 
-  public async fee(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.fee({ ...config });
+  public async stakerFee(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.stakerFee({ ...config });
+  }
+
+  public async funderFee(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.funderFee({ ...config });
+  }
+
+  public async funder(config?: CallOverrides): Promise<string> {
+    return this._contract.funder({ ...config });
   }
 
   public async getBlockAmount(config?: CallOverrides): Promise<BigNumber> {

@@ -13,7 +13,11 @@ export interface IYENClient {
 
   blockMintAmount(config?: CallOverrides): Promise<BigNumber>;
 
-  fee(config?: CallOverrides): Promise<BigNumber>;
+  stakerFee(config?: CallOverrides): Promise<BigNumber>;
+
+  funderFee(config?: CallOverrides): Promise<BigNumber>;
+
+  funder(config?: CallOverrides): Promise<string>;
 
   getBlockAmount(config?: CallOverrides): Promise<BigNumber>;
 
