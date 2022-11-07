@@ -168,6 +168,13 @@ export class YENClient implements IYENClient {
     return this._contract.getPersonBlockList(person, { ...config });
   }
 
+  public async getClaimAmount(
+    person: string,
+    config?: CallOverrides
+  ): Promise<BigNumber> {
+    return this._contract.getClaimAmount(person, { ...config });
+  }
+
   /* ================ TRANSACTION FUNCTIONS ================ */
 
   public async share(

@@ -32,7 +32,8 @@ contract YEN is ERC20 {
         uint128 getAmount;
     }
 
-    uint256 public constant halvingBlockAmount = ((60 * 60 * 24) / 12) * 30;
+    // uint256 public constant halvingBlockAmount = ((60 * 60 * 24) / 12) * 30;
+    uint256 public constant halvingBlockAmount = ((60 * 60 * 24) / 12) * 1;
     uint256 public lastBlock;
     uint256 public halvingBlock;
     uint256 public blockMintAmount = 100 * 10**18;
@@ -149,6 +150,18 @@ contract YEN is ERC20 {
         }
     }
 
+    function getClaimAmount(address sender) public view returns (uint256) {
+        unchecked {
+            Person memory person = personMap[sender];
+            uint256 claimAmount;
+            for (uint256 i = 0; i < person.blockIndex; i++) {
+                Block memory _block = blockMap[person.blockList[i]];
+                claimAmount += _block.mintAmount / _block.personAmount;
+            }
+            return claimAmount;
+        }
+    }
+
     function getRewardAmount(address person) public view returns (uint256) {
         unchecked {
             return
@@ -219,13 +232,7 @@ contract YEN is ERC20 {
     function claim() external _checkMintStart {
         Person memory person = personMap[msg.sender];
         require(person.blockList[person.blockIndex - 1] != block.number, "mint claim cannot in sample block!");
-        uint256 claimAmount;
-        unchecked {
-            for (uint256 i = 0; i < person.blockIndex; i++) {
-                Block memory _block = blockMap[person.blockList[i]];
-                claimAmount += _block.mintAmount / _block.personAmount;
-            }
-        }
+        uint256 claimAmount = getClaimAmount(msg.sender);
         personMap[msg.sender].blockIndex = 0;
         token.transfer(msg.sender, claimAmount);
         emit Claim(msg.sender, claimAmount);
@@ -259,7 +266,7 @@ contract YEN is ERC20 {
     }
 
     function setFunder(address newFunder) external {
-        require(msg.sender == funder,"sender not funder!");
+        require(msg.sender == funder, "sender not funder!");
         funder = newFunder;
     }
 }

@@ -30,7 +30,7 @@ yarn test:cov
 export ENV_FILE='./envs/goerli.env'
 export NETWORK_ID=5
 export WAIT_NUM=1
-export GAS_PRICE=45
+export GAS_PRICE=10
 ```
 
 #### eth
@@ -46,13 +46,9 @@ export GAS_PRICE=30
 #### deploy script
 ```bash
 yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:deploy --contract YEN --gas-price $GAS_PRICE --args [] --network $NETWORK_ID --wait-num $WAIT_NUM
-
-yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:deploy --contract TESTYEN --gas-price $GAS_PRICE --args [] --network $NETWORK_ID --wait-num $WAIT_NUM
 ```
 
 #### verify contract
 ```bash
 yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract YEN --network $NETWORK_ID --args []
-
-yarn run env-cmd -f $ENV_FILE yarn run hardhat contract:verify --contract TESTYEN --network $NETWORK_ID --args []
 ```
