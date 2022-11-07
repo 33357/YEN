@@ -3,25 +3,25 @@ import {
   BigNumber,
   BigNumberish,
   CallOverrides,
-  ContractTransaction,
   PayableOverrides,
   Signer
 } from 'ethers';
 import { YENModel } from 'src/model';
-import { IYENClient } from '..';
+import { IYENClient, ERC20Client } from '.';
 import { YEN, YEN__factory } from '../typechain';
 
-export class YENClient implements IYENClient {
+export class YENClient extends ERC20Client implements IYENClient {
   protected _provider: Provider | Signer;
-  protected _waitConfirmations = 3;
+  protected _waitConfirmations = 1;
   private _contract: YEN;
-  private _errorTitle = 'YENClient';
+  protected _errorTitle = 'YENClient';
 
   constructor(
     provider: Provider | Signer,
     address: string,
     waitConfirmations?: number
   ) {
+    super(provider, address, waitConfirmations);
     if (waitConfirmations) {
       this._waitConfirmations = waitConfirmations;
     }
@@ -35,24 +35,24 @@ export class YENClient implements IYENClient {
 
   /* ================ UTILS FUNCTIONS ================ */
 
-  private _beforeTransaction() {
-    if (this._provider instanceof Provider) {
-      throw `${this._errorTitle}: no singer`;
-    }
-  }
+  // private _beforeTransaction() {
+  //   if (this._provider instanceof Provider) {
+  //     throw `${this._errorTitle}: no singer`;
+  //   }
+  // }
 
-  private async _afterTransaction(
-    transaction: ContractTransaction,
-    callback?: Function
-  ): Promise<any> {
-    if (callback) {
-      callback(transaction);
-    }
-    const receipt = await transaction.wait(this._waitConfirmations);
-    if (callback) {
-      callback(receipt);
-    }
-  }
+  // private async _afterTransaction(
+  //   transaction: ContractTransaction,
+  //   callback?: Function
+  // ): Promise<any> {
+  //   if (callback) {
+  //     callback(transaction);
+  //   }
+  //   const receipt = await transaction.wait(this._waitConfirmations);
+  //   if (callback) {
+  //     callback(receipt);
+  //   }
+  // }
 
   /* ================ VIEW FUNCTIONS ================ */
 

@@ -60,10 +60,7 @@ export interface IYENClient {
 
   getPersonBlockList(person: string, config?: CallOverrides): Promise<number[]>;
 
-  getClaimAmount(
-    person: string,
-    config?: CallOverrides
-  ): Promise<BigNumber>;
+  getClaimAmount(person: string, config?: CallOverrides): Promise<BigNumber>;
 
   /* ================ TRANSACTION FUNCTIONS ================ */
 

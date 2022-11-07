@@ -1,5 +1,4 @@
-import { BigNumber, CallOverrides, PayableOverrides, Signer } from 'ethers';
-import { Provider } from '@ethersproject/providers';
+import { BigNumber, CallOverrides, PayableOverrides } from 'ethers';
 
 export interface IERC20Client {
   address(): string;

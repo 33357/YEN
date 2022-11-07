@@ -20,10 +20,10 @@ export class ERC20Client implements IERC20Client {
     address: string,
     waitConfirmations?: number
   ) {
-    this._erc20 = ERC20__factory.connect(address, provider);
     if (waitConfirmations) {
       this._waitConfirmations = waitConfirmations;
     }
+    this._erc20 = ERC20__factory.connect(address, provider);
     this._provider = provider;
   }
 
@@ -33,13 +33,13 @@ export class ERC20Client implements IERC20Client {
 
   /* ================ UTILS FUNCTIONS ================ */
 
-  private _beforeTransaction() {
+  protected _beforeTransaction() {
     if (this._provider instanceof Provider) {
       throw `${this._errorTitle}: no singer`;
     }
   }
 
-  private async _afterTransaction(
+  protected async _afterTransaction(
     transaction: ContractTransaction,
     callback?: Function
   ): Promise<any> {
