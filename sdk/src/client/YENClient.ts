@@ -3,25 +3,25 @@ import {
   BigNumber,
   BigNumberish,
   CallOverrides,
+  ContractTransaction,
   PayableOverrides,
   Signer
 } from 'ethers';
 import { YENModel } from 'src/model';
-import { IYENClient, ERC20Client } from '.';
+import { IYENClient } from '.';
 import { YEN, YEN__factory } from '../typechain';
 
-export class YENClient extends ERC20Client implements IYENClient {
-  protected _provider: Provider | Signer;
-  protected _waitConfirmations = 1;
+export class YENClient implements IYENClient {
   private _contract: YEN;
-  protected _errorTitle = 'YENClient';
+  private _errorTitle = 'YENClient';
+  private _provider: Provider | Signer;
+  private _waitConfirmations = 1;
 
   constructor(
     provider: Provider | Signer,
     address: string,
     waitConfirmations?: number
   ) {
-    super(provider, address, waitConfirmations);
     if (waitConfirmations) {
       this._waitConfirmations = waitConfirmations;
     }
@@ -35,24 +35,24 @@ export class YENClient extends ERC20Client implements IYENClient {
 
   /* ================ UTILS FUNCTIONS ================ */
 
-  // private _beforeTransaction() {
-  //   if (this._provider instanceof Provider) {
-  //     throw `${this._errorTitle}: no singer`;
-  //   }
-  // }
+  private _beforeTransaction() {
+    if (this._provider instanceof Provider) {
+      throw `${this._errorTitle}: no singer`;
+    }
+  }
 
-  // private async _afterTransaction(
-  //   transaction: ContractTransaction,
-  //   callback?: Function
-  // ): Promise<any> {
-  //   if (callback) {
-  //     callback(transaction);
-  //   }
-  //   const receipt = await transaction.wait(this._waitConfirmations);
-  //   if (callback) {
-  //     callback(receipt);
-  //   }
-  // }
+  private async _afterTransaction(
+    transaction: ContractTransaction,
+    callback?: Function
+  ): Promise<any> {
+    if (callback) {
+      callback(transaction);
+    }
+    const receipt = await transaction.wait(this._waitConfirmations);
+    if (callback) {
+      callback(receipt);
+    }
+  }
 
   /* ================ VIEW FUNCTIONS ================ */
 
@@ -175,6 +175,37 @@ export class YENClient extends ERC20Client implements IYENClient {
     return this._contract.getClaimAmount(person, { ...config });
   }
 
+  public async name(config?: CallOverrides): Promise<string> {
+    return this._contract.name({ ...config });
+  }
+
+  public async symbol(config?: CallOverrides): Promise<string> {
+    return this._contract.symbol({ ...config });
+  }
+
+  public async decimals(config?: CallOverrides): Promise<number> {
+    return this._contract.decimals({ ...config });
+  }
+
+  public async totalSupply(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.totalSupply({ ...config });
+  }
+
+  public async balanceOf(
+    account: string,
+    config?: CallOverrides
+  ): Promise<BigNumber> {
+    return this._contract.balanceOf(account, { ...config });
+  }
+
+  public async allowance(
+    owner: string,
+    spender: string,
+    config?: CallOverrides
+  ): Promise<BigNumber> {
+    return this._contract.allowance(owner, spender, { ...config });
+  }
+
   /* ================ TRANSACTION FUNCTIONS ================ */
 
   public async share(
@@ -182,7 +213,7 @@ export class YENClient extends ERC20Client implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.connect(this._provider).share({
+    const transaction = await this._contract.share({
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -193,7 +224,7 @@ export class YENClient extends ERC20Client implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.connect(this._provider).start({
+    const transaction = await this._contract.start({
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -206,7 +237,6 @@ export class YENClient extends ERC20Client implements IYENClient {
   ): Promise<void> {
     this._beforeTransaction();
     const transaction = await this._contract
-      .connect(this._provider)
       .get(amount, {
         ...config
       });
@@ -218,7 +248,7 @@ export class YENClient extends ERC20Client implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.connect(this._provider).mint({
+    const transaction = await this._contract.mint({
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -229,7 +259,7 @@ export class YENClient extends ERC20Client implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.connect(this._provider).claim({
+    const transaction = await this._contract.claim({
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -242,7 +272,6 @@ export class YENClient extends ERC20Client implements IYENClient {
   ): Promise<void> {
     this._beforeTransaction();
     const transaction = await this._contract
-      .connect(this._provider)
       .stake(amount, {
         ...config
       });
@@ -256,7 +285,6 @@ export class YENClient extends ERC20Client implements IYENClient {
   ): Promise<void> {
     this._beforeTransaction();
     const transaction = await this._contract
-      .connect(this._provider)
       .withdrawStake(amount, {
         ...config
       });
@@ -269,7 +297,6 @@ export class YENClient extends ERC20Client implements IYENClient {
   ): Promise<void> {
     this._beforeTransaction();
     const transaction = await this._contract
-      .connect(this._provider)
       .withdrawReward({
         ...config
       });
@@ -281,9 +308,50 @@ export class YENClient extends ERC20Client implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.connect(this._provider).exit({
+    const transaction = await this._contract.exit({
       ...config
     });
+    this._afterTransaction(transaction, callback);
+  }
+
+  public async transfer(
+    recipient: string,
+    amount: BigNumber,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<void> {
+    this._beforeTransaction();
+    const transaction = await this._contract
+      .transfer(recipient, amount, {
+        ...config
+      });
+    this._afterTransaction(transaction, callback);
+  }
+
+  public async approve(
+    spender: string,
+    amount: BigNumber,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<void> {
+    this._beforeTransaction();
+    const transaction = await this._contract
+      .approve(spender, amount, { ...config });
+    this._afterTransaction(transaction, callback);
+  }
+
+  public async transferFrom(
+    sender: string,
+    recipient: string,
+    amount: BigNumber,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<void> {
+    this._beforeTransaction();
+    const transaction = await this._contract
+      .transferFrom(sender, recipient, amount, {
+        ...config
+      });
     this._afterTransaction(transaction, callback);
   }
 }

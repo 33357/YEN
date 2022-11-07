@@ -62,6 +62,22 @@ export interface IYENClient {
 
   getClaimAmount(person: string, config?: CallOverrides): Promise<BigNumber>;
 
+  name(config?: CallOverrides): Promise<string>;
+
+  symbol(config?: CallOverrides): Promise<string>;
+
+  decimals(config?: CallOverrides): Promise<number>;
+
+  totalSupply(config?: CallOverrides): Promise<BigNumber>;
+
+  balanceOf(account: string, config?: CallOverrides): Promise<BigNumber>;
+
+  allowance(
+    owner: string,
+    spender: string,
+    config?: CallOverrides
+  ): Promise<BigNumber>;
+
   /* ================ TRANSACTION FUNCTIONS ================ */
 
   share(config?: PayableOverrides, callback?: Function): Promise<void>;
@@ -93,4 +109,26 @@ export interface IYENClient {
   withdrawReward(config?: PayableOverrides, callback?: Function): Promise<void>;
 
   exit(config?: PayableOverrides, callback?: Function): Promise<void>;
+
+  transfer(
+    recipient: string,
+    amount: BigNumber,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<void>;
+
+  approve(
+    spender: string,
+    amount: BigNumber,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<void>;
+
+  transferFrom(
+    sender: string,
+    recipient: string,
+    amount: BigNumber,
+    config?: PayableOverrides,
+    callback?: Function
+  ): Promise<void>;
 }
