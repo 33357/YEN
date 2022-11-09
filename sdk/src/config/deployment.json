@@ -1,12 +1,12 @@
 {
   "5": {
     "YEN": {
-      "proxyAddress": "0x45CC000495F03642250b5e0F7e6D446f58474f8A",
-      "implAddress": "0x45CC000495F03642250b5e0F7e6D446f58474f8A",
+      "proxyAddress": "0xC94Cd9A92A4579212BEFb88947BBBDB5240DD99e",
+      "implAddress": "0xC94Cd9A92A4579212BEFb88947BBBDB5240DD99e",
       "version": "1.0.0",
       "contract": "YEN",
       "operator": "0x7609C6831a540fC56281F579d2cEE7e60EBEa489",
-      "fromBlock": 7906803
+      "fromBlock": 7919139
     }
   }
 }

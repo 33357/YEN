@@ -42,7 +42,8 @@ contract YEN is ERC20 {
     uint256 public stakeAmount = 1;
     uint256 public perStakeRewardAmount;
 
-    uint256 public constant shareBlockAmount = ((60 * 60 * 24) / 12) * 3;
+    uint256 public constant shareBlockAmount = ((60 * 60 * 24) / 12) / 24;
+    // uint256 public constant shareBlockAmount = ((60 * 60 * 24) / 12) * 3;
     uint256 public constant shareTokenAmount = 6800000 * 10**18;
     uint256 public constant getBlockAmount = ((60 * 60 * 24) / 12) * 100;
     uint256 public immutable shareEndBlock = block.number + shareBlockAmount;
