@@ -37,8 +37,6 @@ export interface IYENClient {
 
   perStakeRewardAmount(config?: CallOverrides): Promise<BigNumber>;
 
-  shareBlockAmount(config?: CallOverrides): Promise<BigNumber>;
-
   shareEndBlock(config?: CallOverrides): Promise<BigNumber>;
 
   shareEthAmount(config?: CallOverrides): Promise<BigNumber>;

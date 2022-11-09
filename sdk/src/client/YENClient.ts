@@ -116,10 +116,6 @@ export class YENClient implements IYENClient {
     return this._contract.perStakeRewardAmount({ ...config });
   }
 
-  public async shareBlockAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.shareBlockAmount({ ...config });
-  }
-
   public async shareEndBlock(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.shareEndBlock({ ...config });
   }
