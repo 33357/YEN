@@ -9,7 +9,7 @@ import {
 import { IERC20Client } from './';
 import { ERC20, ERC20__factory } from '../typechain';
 
-export class EtherERC20Client implements IERC20Client {
+export class ERC20Client implements IERC20Client {
   private _contract: ERC20;
   private _errorTitle = 'ERC20Client';
   private _provider: Provider | Signer;
