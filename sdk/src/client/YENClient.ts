@@ -232,10 +232,9 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract
-      .get(amount, {
-        ...config
-      });
+    const transaction = await this._contract.get(amount, {
+      ...config
+    });
     this._afterTransaction(transaction, callback);
   }
 
@@ -267,10 +266,9 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract
-      .stake(amount, {
-        ...config
-      });
+    const transaction = await this._contract.stake(amount, {
+      ...config
+    });
     this._afterTransaction(transaction, callback);
   }
 
@@ -280,10 +278,9 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract
-      .withdrawStake(amount, {
-        ...config
-      });
+    const transaction = await this._contract.withdrawStake(amount, {
+      ...config
+    });
     this._afterTransaction(transaction, callback);
   }
 
@@ -292,10 +289,9 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract
-      .withdrawReward({
-        ...config
-      });
+    const transaction = await this._contract.withdrawReward({
+      ...config
+    });
     this._afterTransaction(transaction, callback);
   }
 
@@ -317,10 +313,9 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract
-      .transfer(recipient, amount, {
-        ...config
-      });
+    const transaction = await this._contract.transfer(recipient, amount, {
+      ...config
+    });
     this._afterTransaction(transaction, callback);
   }
 
@@ -331,8 +326,9 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract
-      .approve(spender, amount, { ...config });
+    const transaction = await this._contract.approve(spender, amount, {
+      ...config
+    });
     this._afterTransaction(transaction, callback);
   }
 
@@ -344,10 +340,14 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract
-      .transferFrom(sender, recipient, amount, {
+    const transaction = await this._contract.transferFrom(
+      sender,
+      recipient,
+      amount,
+      {
         ...config
-      });
+      }
+    );
     this._afterTransaction(transaction, callback);
   }
 }
