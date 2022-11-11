@@ -202,6 +202,12 @@ export class YENClient implements IYENClient {
     return this._contract.allowance(owner, spender, { ...config });
   }
 
+  public async pair(
+    config?: CallOverrides
+  ): Promise<string> {
+    return this._contract.pair({ ...config });
+  }
+
   /* ================ TRANSACTION FUNCTIONS ================ */
 
   public async share(

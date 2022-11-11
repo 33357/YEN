@@ -76,6 +76,10 @@ export interface IYENClient {
     config?: CallOverrides
   ): Promise<BigNumber>;
 
+  pair(
+    config?: CallOverrides
+  ): Promise<string>;
+
   /* ================ TRANSACTION FUNCTIONS ================ */
 
   share(config?: PayableOverrides, callback?: Function): Promise<void>;
