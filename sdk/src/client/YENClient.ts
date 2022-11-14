@@ -99,11 +99,11 @@ export class YENClient implements IYENClient {
     return this._contract.lastBlock({ ...config });
   }
 
-  public async maxGetAmount(
+  public async getAmount(
     sharer: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.maxGetAmount(sharer, { ...config });
+    return this._contract.getAmount(sharer, { ...config });
   }
 
   public async mintStartBlock(config?: CallOverrides): Promise<BigNumber> {
@@ -233,12 +233,11 @@ export class YENClient implements IYENClient {
   }
 
   public async get(
-    amount: BigNumberish,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.get(amount, {
+    const transaction = await this._contract.get({
       ...config
     });
     this._afterTransaction(transaction, callback);

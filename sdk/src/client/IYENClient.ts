@@ -31,7 +31,7 @@ export interface IYENClient {
 
   lastBlock(config?: CallOverrides): Promise<BigNumber>;
 
-  maxGetAmount(address: string, config?: CallOverrides): Promise<BigNumber>;
+  getAmount(address: string, config?: CallOverrides): Promise<BigNumber>;
 
   mintStartBlock(config?: CallOverrides): Promise<BigNumber>;
 
@@ -87,7 +87,6 @@ export interface IYENClient {
   start(config?: PayableOverrides, callback?: Function): Promise<void>;
 
   get(
-    amount: BigNumberish,
     config?: PayableOverrides,
     callback?: Function
   ): Promise<void>;

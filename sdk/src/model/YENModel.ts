@@ -49,7 +49,7 @@ export interface Person {
 
 export interface Sharer {
   shareAmount: BigNumberish;
-  getAmount: BigNumberish;
+  gettedAmount: BigNumberish;
 }
 
 export { ContractTransaction, ContractReceipt } from '@ethersproject/contracts';

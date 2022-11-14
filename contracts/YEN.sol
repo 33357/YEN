@@ -29,7 +29,7 @@ contract YEN is ERC20 {
 
     struct Sharer {
         uint128 shareAmount;
-        uint128 getAmount;
+        uint128 gettedAmount;
     }
 
     // uint256 public constant halvingBlockAmount = ((60 * 60 * 24) / 12) * 30;
@@ -123,25 +123,25 @@ contract YEN is ERC20 {
             _balances[funder] += funderFeeAmount;
             emit Transfer(sender, funder, funderFeeAmount);
         }
-        uint256 getAmount = amount - funderFeeAmount - stakerFeeAmount;
-        _balances[recipient] += getAmount;
-        emit Transfer(sender, recipient, getAmount);
+        uint256 recipientAmount = amount - funderFeeAmount - stakerFeeAmount;
+        _balances[recipient] += recipientAmount;
+        emit Transfer(sender, recipient, recipientAmount);
 
         _afterTokenTransfer(sender, recipient, amount);
     }
 
     /* ================ VIEW FUNCTIONS ================ */
 
-    function maxGetAmount(address sharer) public view returns (uint256) {
+    function getAmount(address sharer) public view returns (uint256) {
         unchecked {
-            uint256 percent = ((block.number - mintStartBlock) * 100) / getBlockAmount;
-            if (percent > 100) {
-                percent = 100;
+            uint256 percent = ((block.number - mintStartBlock) * 10000) / getBlockAmount;
+            if (percent > 10000) {
+                percent = 10000;
             }
             return
                 (((sharePairAmount * sharerMap[sharer].shareAmount) / shareEthAmount) * percent) /
-                100 -
-                sharerMap[sharer].getAmount;
+                10000 -
+                sharerMap[sharer].gettedAmount;
         }
     }
 
@@ -201,10 +201,9 @@ contract YEN is ERC20 {
         lastBlock = block.number;
     }
 
-    function get(uint256 amount) external _checkMintStart {
-        uint256 maxAmount = maxGetAmount(msg.sender);
-        require(amount <= maxAmount, "cannot over maxAmount!");
-        sharerMap[msg.sender].getAmount += uint128(amount);
+    function get() external _checkMintStart {
+        uint256 amount = getAmount(msg.sender);
+        sharerMap[msg.sender].gettedAmount += uint128(amount);
         pair.transfer(msg.sender, amount);
         emit Get(msg.sender, amount);
     }
