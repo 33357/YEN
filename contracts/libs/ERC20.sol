@@ -222,17 +222,21 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
         address recipient,
         uint256 amount
     ) internal virtual {
-        //     require(sender != address(0), "ERC20: transfer from the zero address");
-        //     require(recipient != address(0), "ERC20: transfer to the zero address");
-        //     _beforeTokenTransfer(sender, recipient, amount);
-        //     uint256 senderBalance = _balances[sender];
-        //     require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
-        //     unchecked {
-        //         _balances[sender] = senderBalance - amount;
-        //     }
-        //     _balances[recipient] += amount;
-        //     emit Transfer(sender, recipient, amount);
-        //     _afterTokenTransfer(sender, recipient, amount);
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
+
+        _beforeTokenTransfer(sender, recipient, amount);
+
+        uint256 senderBalance = _balances[sender];
+        require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
+        unchecked {
+            _balances[sender] = senderBalance - amount;
+        }
+        _balances[recipient] += amount;
+
+        emit Transfer(sender, recipient, amount);
+
+        _afterTokenTransfer(sender, recipient, amount);
     }
 
     /** @dev Creates `amount` tokens and assigns them to `account`, increasing
@@ -267,22 +271,22 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
      * - `account` cannot be the zero address.
      * - `account` must have at least `amount` tokens.
      */
-    // function _burn(address account, uint256 amount) internal virtual {
-    //     require(account != address(0), "ERC20: burn from the zero address");
+    function _burn(address account, uint256 amount) internal virtual {
+        require(account != address(0), "ERC20: burn from the zero address");
 
-    //     _beforeTokenTransfer(account, address(0), amount);
+        _beforeTokenTransfer(account, address(0), amount);
 
-    //     uint256 accountBalance = _balances[account];
-    //     require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
-    //     unchecked {
-    //         _balances[account] = accountBalance - amount;
-    //     }
-    //     _totalSupply -= amount;
+        uint256 accountBalance = _balances[account];
+        require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+        unchecked {
+            _balances[account] = accountBalance - amount;
+        }
+        _totalSupply -= amount;
 
-    //     emit Transfer(account, address(0), amount);
+        emit Transfer(account, address(0), amount);
 
-    //     _afterTokenTransfer(account, address(0), amount);
-    // }
+        _afterTokenTransfer(account, address(0), amount);
+    }
 
     /**
      * @dev Sets `amount` as the allowance of `spender` over the `owner` s tokens.

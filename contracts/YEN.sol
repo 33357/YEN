@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-import "./libs/ERC20.sol";
+import "./libs/ERC20Burnable.sol";
 import "./interfaces/IUniswapFactory.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IWETH.sol";
 
-contract YEN is ERC20 {
+contract YEN is ERC20Burnable {
     event Share(address indexed person, uint256 amount);
     event Get(address indexed person, uint256 amount);
     event Mint(address indexed person, uint256 index);
@@ -15,43 +15,42 @@ contract YEN is ERC20 {
     event WithdrawReward(address indexed person, uint256 amount);
 
     struct Block {
-        uint128 personAmount;
-        uint128 mintAmount;
+        uint128 persons;
+        uint128 mints;
     }
 
     struct Person {
         uint32[] blockList;
         uint128 blockIndex;
-        uint128 stakeAmount;
-        uint128 rewardAmount;
-        uint128 lastPerStakeRewardAmount;
+        uint128 stakes;
+        uint128 rewards;
+        uint128 lastPerStakeRewards;
     }
 
     struct Sharer {
-        uint128 shareAmount;
-        uint128 gettedAmount;
+        uint128 shares;
+        uint128 getteds;
     }
 
-    // uint256 public constant halvingBlockAmount = ((60 * 60 * 24) / 12) * 30;
-    uint256 public constant halvingBlockAmount = ((60 * 60 * 24) / 12) * 1;
+    // uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 30;
+    uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 1;
     uint256 public lastBlock;
     uint256 public halvingBlock;
-    uint256 public blockMintAmount = 100 * 10**18;
+    uint256 public blockMints = 100 * 10**18;
     uint256 public mintStartBlock;
 
-    uint256 public stakeAmount = 1;
-    uint256 public perStakeRewardAmount;
+    uint256 public stakes = 1;
+    uint256 public perStakeRewards;
 
-    uint256 public constant shareTokenAmount = 6800000 * 10**18;
-    uint256 public constant getBlockAmount = ((60 * 60 * 24) / 12) * 100;
+    uint256 public constant shareTokens = 6800000 * 10**18;
+    uint256 public constant getBlocks = ((60 * 60 * 24) / 12) * 100;
     uint256 public immutable shareEndBlock = block.number + ((60 * 60 * 24) / 12) / 24;
     // uint256 public immutable shareEndBlock = block.number + ((60 * 60 * 24) / 12) * 3;
-    uint256 public shareEthAmount;
-    uint256 public sharePairAmount;
+    uint256 public shareEths;
+    uint256 public sharePairs;
 
-    uint256 public constant stakerFee = 5;
-    uint256 public constant funderFee = 5;
-    address public funder = msg.sender;
+    // uint256 public transfers;
+    // uint256 public last100TransferBlock;
 
     // IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     IWETH public constant weth = IWETH(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6);
@@ -72,17 +71,17 @@ contract YEN is ERC20 {
     modifier _checkHalving() {
         unchecked {
             if (block.number >= halvingBlock) {
-                blockMintAmount /= 2;
-                halvingBlock += halvingBlockAmount;
+                blockMints /= 2;
+                halvingBlock += halvingBlocks;
             }
         }
         _;
     }
 
     modifier _checkReward() {
-        if (personMap[msg.sender].lastPerStakeRewardAmount != perStakeRewardAmount) {
-            personMap[msg.sender].rewardAmount = uint128(getRewardAmount(msg.sender));
-            personMap[msg.sender].lastPerStakeRewardAmount = uint128(perStakeRewardAmount);
+        if (personMap[msg.sender].lastPerStakeRewards != perStakeRewards) {
+            personMap[msg.sender].rewards = uint128(getRewards(msg.sender));
+            personMap[msg.sender].lastPerStakeRewards = uint128(perStakeRewards);
         }
         _;
     }
@@ -92,8 +91,8 @@ contract YEN is ERC20 {
         _;
     }
 
-    function _addPerStakeRewardAmount(uint256 addAmount) internal {
-        perStakeRewardAmount += addAmount / stakeAmount;
+    function _addPerStakeRewards(uint256 adds) internal {
+        perStakeRewards += adds / stakes;
     }
 
     function _transfer(
@@ -112,63 +111,71 @@ contract YEN is ERC20 {
             _balances[sender] = senderBalance - amount;
         }
 
-        uint256 stakerFeeAmount;
-        uint256 funderFeeAmount;
+        uint256 fees;
         if (sender != address(this)) {
-            stakerFeeAmount = (amount * stakerFee) / 10000;
-            funderFeeAmount = (amount * funderFee) / 10000;
-            _balances[address(this)] += stakerFeeAmount;
-            _addPerStakeRewardAmount(stakerFeeAmount);
-            emit Transfer(sender, address(this), stakerFeeAmount);
-            _balances[funder] += funderFeeAmount;
-            emit Transfer(sender, funder, funderFeeAmount);
+            fees = amount / 1000;
+            _balances[address(this)] += fees;
+            emit Transfer(sender, address(this), fees);
+            uint256 burnFees = fees / 5;
+            _burn(address(this), burnFees);
+            _addPerStakeRewards(fees - burnFees);
         }
-        uint256 recipientAmount = amount - funderFeeAmount - stakerFeeAmount;
-        _balances[recipient] += recipientAmount;
-        emit Transfer(sender, recipient, recipientAmount);
+
+        uint256 recipients = amount - fees;
+        _balances[recipient] += recipients;
+        emit Transfer(sender, recipient, recipients);
 
         _afterTokenTransfer(sender, recipient, amount);
     }
 
     /* ================ VIEW FUNCTIONS ================ */
 
-    function getAmount(address sharer) public view returns (uint256) {
+    // function getFeeMul() public view returns (uint256) {
+    //     unchecked {
+    //         if (transfers >= 100) {
+    //             transfers = 0;
+    //             last100TransferBlock = block.number;
+    //         } else {
+    //             transfers++;
+    //         }
+    //     }
+    // }
+
+    function gets(address sharer) public view returns (uint256) {
         unchecked {
-            uint256 percent = ((block.number - mintStartBlock) * 10000) / getBlockAmount;
+            uint256 percent = ((block.number - mintStartBlock) * 10000) / getBlocks;
             if (percent > 10000) {
                 percent = 10000;
             }
             return
-                (((sharePairAmount * sharerMap[sharer].shareAmount) / shareEthAmount) * percent) /
-                10000 -
-                sharerMap[sharer].gettedAmount;
+                (((sharePairs * sharerMap[sharer].shares) / shareEths) * percent) / 10000 - sharerMap[sharer].getteds;
         }
     }
 
-    function getMintAmount() public view returns (uint256) {
+    function getMints() public view returns (uint256) {
         unchecked {
-            return (block.number - lastBlock) * blockMintAmount;
+            return (block.number - lastBlock) * blockMints;
         }
     }
 
-    function getClaimAmount(address sender) public view returns (uint256) {
+    function getClaims(address sender) public view returns (uint256) {
         unchecked {
             Person memory person = personMap[sender];
-            uint256 claimAmount;
+            uint256 claims;
             for (uint256 i = 0; i < person.blockIndex; i++) {
                 Block memory _block = blockMap[person.blockList[i]];
-                claimAmount += _block.mintAmount / _block.personAmount;
+                claims += _block.mints / _block.persons;
             }
-            return claimAmount;
+            return claims;
         }
     }
 
-    function getRewardAmount(address person) public view returns (uint256) {
+    function getRewards(address person) public view returns (uint256) {
         unchecked {
             return
-                personMap[person].stakeAmount *
-                (perStakeRewardAmount - personMap[person].lastPerStakeRewardAmount) +
-                personMap[person].rewardAmount;
+                personMap[person].stakes *
+                (perStakeRewards - personMap[person].lastPerStakeRewards) +
+                personMap[person].rewards;
         }
     }
 
@@ -184,37 +191,37 @@ contract YEN is ERC20 {
 
     function share() external payable {
         require(block.number < shareEndBlock, "block cannot over shareEndBlock!");
-        sharerMap[msg.sender].shareAmount += uint128(msg.value);
-        shareEthAmount += msg.value;
+        sharerMap[msg.sender].shares += uint128(msg.value);
+        shareEths += msg.value;
         emit Share(msg.sender, msg.value);
     }
 
     function start() external {
         require(block.number >= shareEndBlock, "block must over shareEndBlock!");
         require(mintStartBlock == 0, "mint cannot start!");
-        weth.deposit{value: shareEthAmount}();
-        weth.transfer(address(pair), shareEthAmount);
-        _mint(address(pair), shareTokenAmount);
-        sharePairAmount = pair.mint(address(this));
+        weth.deposit{value: shareEths}();
+        weth.transfer(address(pair), shareEths);
+        _mint(address(pair), shareTokens);
+        sharePairs = pair.mint(address(this));
         mintStartBlock = block.number;
-        halvingBlock = block.number + halvingBlockAmount;
+        halvingBlock = block.number + halvingBlocks;
         lastBlock = block.number;
     }
 
     function get() external _checkMintStart {
-        uint256 amount = getAmount(msg.sender);
-        sharerMap[msg.sender].gettedAmount += uint128(amount);
+        uint256 amount = gets(msg.sender);
+        sharerMap[msg.sender].getteds += uint128(amount);
         pair.transfer(msg.sender, amount);
         emit Get(msg.sender, amount);
     }
 
     function mint() external _checkMintStart _checkHalving {
         if (block.number != lastBlock) {
-            uint256 mintAmount = getMintAmount();
-            _mint(address(this), mintAmount);
-            blockMap[block.number].mintAmount = uint128(mintAmount / 2);
+            uint256 mints = getMints();
+            _mint(address(this), mints);
+            blockMap[block.number].mints = uint128(mints / 2);
             lastBlock = block.number;
-            _addPerStakeRewardAmount(blockMap[block.number].mintAmount);
+            _addPerStakeRewards(blockMap[block.number].mints);
         }
         Person storage person = personMap[msg.sender];
         if (person.blockList.length == person.blockIndex) {
@@ -222,9 +229,9 @@ contract YEN is ERC20 {
         } else {
             person.blockList[person.blockIndex] = uint32(block.number);
         }
-        emit Mint(msg.sender, blockMap[block.number].personAmount);
+        emit Mint(msg.sender, blockMap[block.number].persons);
         unchecked {
-            blockMap[block.number].personAmount++;
+            blockMap[block.number].persons++;
             person.blockIndex++;
         }
     }
@@ -232,41 +239,36 @@ contract YEN is ERC20 {
     function claim() external _checkMintStart {
         Person memory person = personMap[msg.sender];
         require(person.blockList[person.blockIndex - 1] != block.number, "mint claim cannot in sample block!");
-        uint256 claimAmount = getClaimAmount(msg.sender);
+        uint256 claims = getClaims(msg.sender);
         personMap[msg.sender].blockIndex = 0;
-        token.transfer(msg.sender, claimAmount);
-        emit Claim(msg.sender, claimAmount);
+        token.transfer(msg.sender, claims);
+        emit Claim(msg.sender, claims);
     }
 
     function stake(uint256 amount) external _checkMintStart _checkReward {
         pair.transferFrom(msg.sender, address(this), amount);
-        personMap[msg.sender].stakeAmount += uint128(amount);
-        stakeAmount += amount;
+        personMap[msg.sender].stakes += uint128(amount);
+        stakes += amount;
         emit Stake(msg.sender, amount);
     }
 
     function withdrawStake(uint256 amount) public _checkMintStart _checkReward {
-        require(amount <= personMap[msg.sender].stakeAmount, "amount cannot over stakeAmount!");
-        personMap[msg.sender].stakeAmount -= uint128(amount);
-        stakeAmount -= amount;
+        require(amount <= personMap[msg.sender].stakes, "amount cannot over stakes!");
+        personMap[msg.sender].stakes -= uint128(amount);
+        stakes -= amount;
         pair.transfer(msg.sender, amount);
         emit WithdrawStake(msg.sender, amount);
     }
 
     function withdrawReward() public _checkMintStart _checkReward {
-        uint256 rewardAmount = personMap[msg.sender].rewardAmount;
-        personMap[msg.sender].rewardAmount = 0;
-        token.transfer(msg.sender, rewardAmount);
-        emit WithdrawReward(msg.sender, rewardAmount);
+        uint256 rewards = personMap[msg.sender].rewards;
+        personMap[msg.sender].rewards = 0;
+        token.transfer(msg.sender, rewards);
+        emit WithdrawReward(msg.sender, rewards);
     }
 
     function exit() external {
-        withdrawStake(personMap[msg.sender].stakeAmount);
+        withdrawStake(personMap[msg.sender].stakes);
         withdrawReward();
-    }
-
-    function setFunder(address newFunder) external {
-        require(msg.sender == funder, "sender not funder!");
-        funder = newFunder;
     }
 }
