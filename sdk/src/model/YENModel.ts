@@ -36,20 +36,20 @@ export interface WithdrawRewardEvent {
 }
 
 export interface Block {
-  personAmount: BigNumberish;
-  mintAmount: BigNumberish;
+  persons: BigNumberish;
+  mints: BigNumberish;
 }
 
 export interface Person {
   blockIndex: BigNumberish;
-  stakeAmount: BigNumberish;
-  rewardAmount: BigNumberish;
-  lastPerStakeRewardAmount: BigNumberish;
+  stakes: BigNumberish;
+  rewards: BigNumberish;
+  lastPerStakeRewards: BigNumberish;
 }
 
 export interface Sharer {
-  shareAmount: BigNumberish;
-  gettedAmount: BigNumberish;
+  shares: BigNumberish;
+  getteds: BigNumberish;
 }
 
 export { ContractTransaction, ContractReceipt } from '@ethersproject/contracts';

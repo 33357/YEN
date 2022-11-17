@@ -56,84 +56,76 @@ export class YENClient implements IYENClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
-  public async blockMintAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.blockMintAmount({ ...config });
+  public async getFeeMul(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.getFeeMul({ ...config });
   }
 
-  public async stakerFee(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.stakerFee({ ...config });
+  public async blockMints(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.blockMints({ ...config });
   }
 
-  public async funderFee(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.funderFee({ ...config });
+  public async getBlocks(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.getBlocks({ ...config });
   }
 
-  public async funder(config?: CallOverrides): Promise<string> {
-    return this._contract.funder({ ...config });
+  public async getMints(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.getMints({ ...config });
   }
 
-  public async getBlockAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.getBlockAmount({ ...config });
-  }
-
-  public async getMintAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.getMintAmount({ ...config });
-  }
-
-  public async getRewardAmount(
+  public async getRewards(
     address: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.getRewardAmount(address, { ...config });
+    return this._contract.getRewards(address, { ...config });
   }
 
   public async halvingBlock(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.halvingBlock({ ...config });
   }
 
-  public async halvingBlockAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.halvingBlockAmount({ ...config });
+  public async halvingBlocks(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.halvingBlocks({ ...config });
   }
 
   public async lastBlock(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.lastBlock({ ...config });
   }
 
-  public async getAmount(
+  public async gets(
     sharer: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.getAmount(sharer, { ...config });
+    return this._contract.gets(sharer, { ...config });
   }
 
   public async mintStartBlock(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.mintStartBlock({ ...config });
   }
 
-  public async perStakeRewardAmount(
+  public async perStakeRewards(
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.perStakeRewardAmount({ ...config });
+    return this._contract.perStakeRewards({ ...config });
   }
 
   public async shareEndBlock(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.shareEndBlock({ ...config });
   }
 
-  public async shareEthAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.shareEthAmount({ ...config });
+  public async shareEths(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.shareEths({ ...config });
   }
 
-  public async sharePairAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.sharePairAmount({ ...config });
+  public async sharePairs(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.sharePairs({ ...config });
   }
 
-  public async shareTokenAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.shareTokenAmount({ ...config });
+  public async shareTokens(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.shareTokens({ ...config });
   }
 
-  public async stakeAmount(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.stakeAmount({ ...config });
+  public async stakes(config?: CallOverrides): Promise<BigNumber> {
+    return this._contract.stakes({ ...config });
   }
 
   public async blockMap(
@@ -164,11 +156,11 @@ export class YENClient implements IYENClient {
     return this._contract.getPersonBlockList(person, { ...config });
   }
 
-  public async getClaimAmount(
+  public async getClaims(
     person: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.getClaimAmount(person, { ...config });
+    return this._contract.getClaims(person, { ...config });
   }
 
   public async name(config?: CallOverrides): Promise<string> {

@@ -11,41 +11,37 @@ export interface IYENClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
-  blockMintAmount(config?: CallOverrides): Promise<BigNumber>;
+  getFeeMul(config?: CallOverrides): Promise<BigNumber>;
 
-  stakerFee(config?: CallOverrides): Promise<BigNumber>;
+  blockMints(config?: CallOverrides): Promise<BigNumber>;
 
-  funderFee(config?: CallOverrides): Promise<BigNumber>;
+  getBlocks(config?: CallOverrides): Promise<BigNumber>;
 
-  funder(config?: CallOverrides): Promise<string>;
+  getMints(config?: CallOverrides): Promise<BigNumber>;
 
-  getBlockAmount(config?: CallOverrides): Promise<BigNumber>;
-
-  getMintAmount(config?: CallOverrides): Promise<BigNumber>;
-
-  getRewardAmount(address: string, config?: CallOverrides): Promise<BigNumber>;
+  getRewards(address: string, config?: CallOverrides): Promise<BigNumber>;
 
   halvingBlock(config?: CallOverrides): Promise<BigNumber>;
 
-  halvingBlockAmount(config?: CallOverrides): Promise<BigNumber>;
+  halvingBlocks(config?: CallOverrides): Promise<BigNumber>;
 
   lastBlock(config?: CallOverrides): Promise<BigNumber>;
 
-  getAmount(address: string, config?: CallOverrides): Promise<BigNumber>;
+  gets(address: string, config?: CallOverrides): Promise<BigNumber>;
 
   mintStartBlock(config?: CallOverrides): Promise<BigNumber>;
 
-  perStakeRewardAmount(config?: CallOverrides): Promise<BigNumber>;
+  perStakeRewards(config?: CallOverrides): Promise<BigNumber>;
 
   shareEndBlock(config?: CallOverrides): Promise<BigNumber>;
 
-  shareEthAmount(config?: CallOverrides): Promise<BigNumber>;
+  shareEths(config?: CallOverrides): Promise<BigNumber>;
 
-  sharePairAmount(config?: CallOverrides): Promise<BigNumber>;
+  sharePairs(config?: CallOverrides): Promise<BigNumber>;
 
-  shareTokenAmount(config?: CallOverrides): Promise<BigNumber>;
+  shareTokens(config?: CallOverrides): Promise<BigNumber>;
 
-  stakeAmount(config?: CallOverrides): Promise<BigNumber>;
+  stakes(config?: CallOverrides): Promise<BigNumber>;
 
   blockMap(
     blockNumber: BigNumberish,
@@ -58,7 +54,7 @@ export interface IYENClient {
 
   getPersonBlockList(person: string, config?: CallOverrides): Promise<number[]>;
 
-  getClaimAmount(person: string, config?: CallOverrides): Promise<BigNumber>;
+  getClaims(person: string, config?: CallOverrides): Promise<BigNumber>;
 
   name(config?: CallOverrides): Promise<string>;
 
