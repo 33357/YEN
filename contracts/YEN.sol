@@ -49,8 +49,10 @@ contract YEN is ERC20Burnable {
     uint256 public shareEths;
     uint256 public sharePairs;
 
-    // uint256 public transfers;
-    // uint256 public last100TransferBlock;
+    uint256 public constant feeAddBlock = (60 * 60) / 12;
+    uint256 public transfers;
+    uint256 public last100TransferBlock;
+    uint256 public lastFeeMul = 1;
 
     // IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     IWETH public constant weth = IWETH(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6);
@@ -91,55 +93,71 @@ contract YEN is ERC20Burnable {
         _;
     }
 
+    modifier _checkFeeMul() {
+        unchecked {
+            if (transfers == 100) {
+                lastFeeMul = getFeeMul();
+                transfers = 0;
+                last100TransferBlock = block.number;
+            } else {
+                transfers++;
+            }
+        }
+        _;
+    }
+
     function _addPerStakeRewards(uint256 adds) internal {
-        perStakeRewards += adds / stakes;
+        unchecked {
+            perStakeRewards += adds / stakes;
+        }
     }
 
     function _transfer(
         address sender,
         address recipient,
         uint256 amount
-    ) internal override {
-        require(sender != address(0), "ERC20: transfer from the zero address");
-        require(recipient != address(0), "ERC20: transfer to the zero address");
-
-        _beforeTokenTransfer(sender, recipient, amount);
-
-        uint256 senderBalance = _balances[sender];
-        require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
+    ) internal override _checkFeeMul {
         unchecked {
+            require(sender != address(0), "ERC20: transfer from the zero address");
+            require(recipient != address(0), "ERC20: transfer to the zero address");
+
+            _beforeTokenTransfer(sender, recipient, amount);
+
+            uint256 senderBalance = _balances[sender];
+            require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
+
             _balances[sender] = senderBalance - amount;
+
+            uint256 fees;
+            if (sender != address(this)) {
+                fees = (amount * getFeeMul()) / 1000;
+                _balances[address(this)] += fees;
+                emit Transfer(sender, address(this), fees);
+                uint256 burnFees = fees / 5;
+                _burn(address(this), burnFees);
+                _addPerStakeRewards(fees - burnFees);
+            }
+
+            uint256 recipients = amount - fees;
+            _balances[recipient] += recipients;
+            emit Transfer(sender, recipient, recipients);
+
+            _afterTokenTransfer(sender, recipient, amount);
         }
-
-        uint256 fees;
-        if (sender != address(this)) {
-            fees = amount / 1000;
-            _balances[address(this)] += fees;
-            emit Transfer(sender, address(this), fees);
-            uint256 burnFees = fees / 5;
-            _burn(address(this), burnFees);
-            _addPerStakeRewards(fees - burnFees);
-        }
-
-        uint256 recipients = amount - fees;
-        _balances[recipient] += recipients;
-        emit Transfer(sender, recipient, recipients);
-
-        _afterTokenTransfer(sender, recipient, amount);
     }
 
     /* ================ VIEW FUNCTIONS ================ */
 
-    // function getFeeMul() public view returns (uint256) {
-    //     unchecked {
-    //         if (transfers >= 100) {
-    //             transfers = 0;
-    //             last100TransferBlock = block.number;
-    //         } else {
-    //             transfers++;
-    //         }
-    //     }
-    // }
+    function getFeeMul() public view returns (uint256) {
+        unchecked {
+            uint256 mul = (block.number - last100TransferBlock) / feeAddBlock;
+            if (mul > 9) {
+                mul = 9;
+            }
+            mul = 10 - mul;
+            return mul < lastFeeMul ? mul : lastFeeMul;
+        }
+    }
 
     function gets(address sharer) public view returns (uint256) {
         unchecked {
@@ -180,91 +198,107 @@ contract YEN is ERC20Burnable {
     }
 
     function getPersonBlockList(address person) external view returns (uint32[] memory) {
-        uint32[] memory blockList = new uint32[](personMap[person].blockIndex);
-        for (uint256 i = 0; i < personMap[person].blockIndex; i++) {
-            blockList[i] = personMap[person].blockList[i];
+        unchecked {
+            uint32[] memory blockList = new uint32[](personMap[person].blockIndex);
+            for (uint256 i = 0; i < personMap[person].blockIndex; i++) {
+                blockList[i] = personMap[person].blockList[i];
+            }
+            return blockList;
         }
-        return blockList;
     }
 
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function share() external payable {
-        require(block.number < shareEndBlock, "block cannot over shareEndBlock!");
-        sharerMap[msg.sender].shares += uint128(msg.value);
-        shareEths += msg.value;
-        emit Share(msg.sender, msg.value);
+        unchecked {
+            require(block.number < shareEndBlock, "block cannot over shareEndBlock!");
+            sharerMap[msg.sender].shares += uint128(msg.value);
+            shareEths += msg.value;
+            emit Share(msg.sender, msg.value);
+        }
     }
 
     function start() external {
-        require(block.number >= shareEndBlock, "block must over shareEndBlock!");
-        require(mintStartBlock == 0, "mint cannot start!");
-        weth.deposit{value: shareEths}();
-        weth.transfer(address(pair), shareEths);
-        _mint(address(pair), shareTokens);
-        sharePairs = pair.mint(address(this));
-        mintStartBlock = block.number;
-        halvingBlock = block.number + halvingBlocks;
-        lastBlock = block.number;
+        unchecked {
+            require(block.number >= shareEndBlock, "block must over shareEndBlock!");
+            require(mintStartBlock == 0, "mint cannot start!");
+            weth.deposit{value: shareEths}();
+            weth.transfer(address(pair), shareEths);
+            _mint(address(pair), shareTokens);
+            sharePairs = pair.mint(address(this));
+            mintStartBlock = block.number;
+            halvingBlock = block.number + halvingBlocks;
+            lastBlock = block.number;
+        }
     }
 
     function get() external _checkMintStart {
-        uint256 amount = gets(msg.sender);
-        sharerMap[msg.sender].getteds += uint128(amount);
-        pair.transfer(msg.sender, amount);
-        emit Get(msg.sender, amount);
+        unchecked {
+            uint256 amount = gets(msg.sender);
+            sharerMap[msg.sender].getteds += uint128(amount);
+            pair.transfer(msg.sender, amount);
+            emit Get(msg.sender, amount);
+        }
     }
 
     function mint() external _checkMintStart _checkHalving {
-        if (block.number != lastBlock) {
-            uint256 mints = getMints();
-            _mint(address(this), mints);
-            blockMap[block.number].mints = uint128(mints / 2);
-            lastBlock = block.number;
-            _addPerStakeRewards(blockMap[block.number].mints);
-        }
-        Person storage person = personMap[msg.sender];
-        if (person.blockList.length == person.blockIndex) {
-            person.blockList.push(uint32(block.number));
-        } else {
-            person.blockList[person.blockIndex] = uint32(block.number);
-        }
-        emit Mint(msg.sender, blockMap[block.number].persons);
         unchecked {
+            if (block.number != lastBlock) {
+                uint256 mints = getMints();
+                _mint(address(this), mints);
+                blockMap[block.number].mints = uint128(mints / 2);
+                lastBlock = block.number;
+                _addPerStakeRewards(blockMap[block.number].mints);
+            }
+            Person storage person = personMap[msg.sender];
+            if (person.blockList.length == person.blockIndex) {
+                person.blockList.push(uint32(block.number));
+            } else {
+                person.blockList[person.blockIndex] = uint32(block.number);
+            }
+            emit Mint(msg.sender, blockMap[block.number].persons);
             blockMap[block.number].persons++;
             person.blockIndex++;
         }
     }
 
     function claim() external _checkMintStart {
-        Person memory person = personMap[msg.sender];
-        require(person.blockList[person.blockIndex - 1] != block.number, "mint claim cannot in sample block!");
-        uint256 claims = getClaims(msg.sender);
-        personMap[msg.sender].blockIndex = 0;
-        token.transfer(msg.sender, claims);
-        emit Claim(msg.sender, claims);
+        unchecked {
+            Person memory person = personMap[msg.sender];
+            require(person.blockList[person.blockIndex - 1] != block.number, "mint claim cannot in sample block!");
+            uint256 claims = getClaims(msg.sender);
+            personMap[msg.sender].blockIndex = 0;
+            token.transfer(msg.sender, claims);
+            emit Claim(msg.sender, claims);
+        }
     }
 
     function stake(uint256 amount) external _checkMintStart _checkReward {
-        pair.transferFrom(msg.sender, address(this), amount);
-        personMap[msg.sender].stakes += uint128(amount);
-        stakes += amount;
-        emit Stake(msg.sender, amount);
+        unchecked {
+            pair.transferFrom(msg.sender, address(this), amount);
+            personMap[msg.sender].stakes += uint128(amount);
+            stakes += amount;
+            emit Stake(msg.sender, amount);
+        }
     }
 
     function withdrawStake(uint256 amount) public _checkMintStart _checkReward {
-        require(amount <= personMap[msg.sender].stakes, "amount cannot over stakes!");
-        personMap[msg.sender].stakes -= uint128(amount);
-        stakes -= amount;
-        pair.transfer(msg.sender, amount);
-        emit WithdrawStake(msg.sender, amount);
+        unchecked {
+            require(amount <= personMap[msg.sender].stakes, "amount cannot over stakes!");
+            personMap[msg.sender].stakes -= uint128(amount);
+            stakes -= amount;
+            pair.transfer(msg.sender, amount);
+            emit WithdrawStake(msg.sender, amount);
+        }
     }
 
     function withdrawReward() public _checkMintStart _checkReward {
-        uint256 rewards = personMap[msg.sender].rewards;
-        personMap[msg.sender].rewards = 0;
-        token.transfer(msg.sender, rewards);
-        emit WithdrawReward(msg.sender, rewards);
+        unchecked {
+            uint256 rewards = personMap[msg.sender].rewards;
+            personMap[msg.sender].rewards = 0;
+            token.transfer(msg.sender, rewards);
+            emit WithdrawReward(msg.sender, rewards);
+        }
     }
 
     function exit() external {
