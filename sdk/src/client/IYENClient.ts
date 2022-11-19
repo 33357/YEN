@@ -27,7 +27,7 @@ export interface IYENClient {
 
   lastBlock(config?: CallOverrides): Promise<BigNumber>;
 
-  gets(address: string, config?: CallOverrides): Promise<BigNumber>;
+  getShares(address: string, config?: CallOverrides): Promise<BigNumber>;
 
   mintStartBlock(config?: CallOverrides): Promise<BigNumber>;
 
@@ -82,7 +82,7 @@ export interface IYENClient {
 
   start(config?: PayableOverrides, callback?: Function): Promise<void>;
 
-  get(
+  getShare(
     config?: PayableOverrides,
     callback?: Function
   ): Promise<void>;

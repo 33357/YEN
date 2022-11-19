@@ -159,7 +159,7 @@ contract YEN is ERC20Burnable {
         }
     }
 
-    function gets(address sharer) public view returns (uint256) {
+    function getShares(address sharer) public view returns (uint256) {
         unchecked {
             uint256 percent = ((block.number - mintStartBlock) * 10000) / getBlocks;
             if (percent > 10000) {
@@ -232,9 +232,9 @@ contract YEN is ERC20Burnable {
         }
     }
 
-    function get() external _checkMintStart {
+    function getShare() external _checkMintStart {
         unchecked {
-            uint256 amount = gets(msg.sender);
+            uint256 amount = getShares(msg.sender);
             sharerMap[msg.sender].getteds += uint128(amount);
             pair.transfer(msg.sender, amount);
             emit Get(msg.sender, amount);

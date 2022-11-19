@@ -91,11 +91,11 @@ export class YENClient implements IYENClient {
     return this._contract.lastBlock({ ...config });
   }
 
-  public async gets(
+  public async getShares(
     sharer: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.gets(sharer, { ...config });
+    return this._contract.getShares(sharer, { ...config });
   }
 
   public async mintStartBlock(config?: CallOverrides): Promise<BigNumber> {
@@ -224,12 +224,12 @@ export class YENClient implements IYENClient {
     this._afterTransaction(transaction, callback);
   }
 
-  public async get(
+  public async getShare(
     config?: PayableOverrides,
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.get({
+    const transaction = await this._contract.getShare({
       ...config
     });
     this._afterTransaction(transaction, callback);
