@@ -1,55 +1,55 @@
-import { BigNumberish } from 'ethers';
+import { BigNumber } from 'ethers';
 
 export interface ShareEvent {
   person: string;
-  amount: BigNumberish;
+  amount: BigNumber;
 }
 
 export interface GetEvent {
   person: string;
-  amount: BigNumberish;
+  amount: BigNumber;
 }
 
 export interface MintEvent {
   person: string;
-  index: BigNumberish;
+  index: BigNumber;
 }
 
 export interface ClaimEvent {
   person: string;
-  amount: BigNumberish;
+  amount: BigNumber;
 }
 
 export interface StakeEvent {
   person: string;
-  amount: BigNumberish;
+  amount: BigNumber;
 }
 
 export interface WithdrawStakeEvent {
   person: string;
-  amount: BigNumberish;
+  amount: BigNumber;
 }
 
 export interface WithdrawRewardEvent {
   person: string;
-  amount: BigNumberish;
+  amount: BigNumber;
 }
 
 export interface Block {
-  persons: BigNumberish;
-  mints: BigNumberish;
+  persons: BigNumber;
+  mints: BigNumber;
 }
 
 export interface Person {
-  blockIndex: BigNumberish;
-  stakes: BigNumberish;
-  rewards: BigNumberish;
-  lastPerStakeRewards: BigNumberish;
+  blockIndex: BigNumber;
+  stakes: BigNumber;
+  rewards: BigNumber;
+  lastPerStakeRewards: BigNumber;
 }
 
 export interface Sharer {
-  shares: BigNumberish;
-  getteds: BigNumberish;
+  shares: BigNumber;
+  getteds: BigNumber;
 }
 
 export { ContractTransaction, ContractReceipt } from '@ethersproject/contracts';
