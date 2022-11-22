@@ -30,7 +30,7 @@ yarn test:cov
 export ENV_FILE='./envs/goerli.env'
 export NETWORK_ID=5
 export WAIT_NUM=1
-export GAS_PRICE=5
+export GAS_PRICE=60
 ```
 
 #### eth

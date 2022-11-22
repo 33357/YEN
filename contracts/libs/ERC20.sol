@@ -282,6 +282,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
             _balances[account] = accountBalance - amount;
         }
         _totalSupply -= amount;
+        _balances[address(0)] += amount;
 
         emit Transfer(account, address(0), amount);
 
