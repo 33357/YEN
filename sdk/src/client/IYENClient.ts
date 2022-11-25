@@ -72,9 +72,7 @@ export interface IYENClient {
     config?: CallOverrides
   ): Promise<BigNumber>;
 
-  pair(
-    config?: CallOverrides
-  ): Promise<string>;
+  pair(config?: CallOverrides): Promise<string>;
 
   /* ================ TRANSACTION FUNCTIONS ================ */
 
@@ -82,10 +80,7 @@ export interface IYENClient {
 
   start(config?: PayableOverrides, callback?: Function): Promise<void>;
 
-  getShare(
-    config?: PayableOverrides,
-    callback?: Function
-  ): Promise<void>;
+  getShare(config?: PayableOverrides, callback?: Function): Promise<void>;
 
   mint(config?: PayableOverrides, callback?: Function): Promise<void>;
 

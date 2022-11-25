@@ -27,7 +27,6 @@ describe(`test ${contractName}`, function () {
       Logger.info(`deployed ${contractName}`);
     });
 
-    it('check init data', async function () {
-    });
+    it('check init data', async function () {});
   });
 });

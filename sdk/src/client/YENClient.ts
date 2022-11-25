@@ -102,9 +102,7 @@ export class YENClient implements IYENClient {
     return this._contract.mintStartBlock({ ...config });
   }
 
-  public async perStakeRewards(
-    config?: CallOverrides
-  ): Promise<BigNumber> {
+  public async perStakeRewards(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.perStakeRewards({ ...config });
   }
 
@@ -194,9 +192,7 @@ export class YENClient implements IYENClient {
     return this._contract.allowance(owner, spender, { ...config });
   }
 
-  public async pair(
-    config?: CallOverrides
-  ): Promise<string> {
+  public async pair(config?: CallOverrides): Promise<string> {
     return this._contract.pair({ ...config });
   }
 
