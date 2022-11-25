@@ -52,7 +52,7 @@ contract YEN is ERC20Burnable {
 
     uint256 public constant feeAddBlock = (60 * 60) / 12;
     // uint256 public constant maxTransfers = 100;
-    uint256 public constant maxTransfers = 2 - 1;
+    uint256 public constant maxTransfers = 1;
     uint256 public transfers;
     uint256 public last100TransferBlock;
     uint256 public lastFeeMul = 1;
