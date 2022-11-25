@@ -2,8 +2,7 @@ import {expect} from 'chai';
 import {ethers, getNamedAccounts} from 'hardhat';
 import {Signer} from 'ethers';
 import pino from 'pino';
-import {EtherYENClient} from '../sdk/dist';
-import {YEN} from '../sdk/src/typechain';
+import {YENClient} from '../sdk/dist';
 
 const Logger = pino();
 const contractName = 'YEN';
@@ -19,27 +18,16 @@ describe(`test ${contractName}`, function () {
   });
 
   describe(`test sdk`, function () {
-    let contract: EtherYENClient;
+    let yen: YENClient;
 
     beforeEach('deploy and init contract', async () => {
       const Contract = await ethers.getContractFactory(`${contractName}`);
       const contractResult = await Contract.connect(deployer).deploy();
-      contract = new EtherYENClient(deployer, contractResult.address);
+      yen = new YENClient(deployer, contractResult.address);
       Logger.info(`deployed ${contractName}`);
     });
 
-    it('check init data', async function () {});
-  });
-
-  describe(`test contract`, function () {
-    let contract: YEN;
-
-    beforeEach('deploy and init contract', async () => {
-      const Contract = await ethers.getContractFactory(contractName);
-      contract = (await Contract.deploy()) as YEN;
-      Logger.info(`deployed ${contractName}`);
+    it('check init data', async function () {
     });
-
-    it('check admin', async function () {});
   });
 });

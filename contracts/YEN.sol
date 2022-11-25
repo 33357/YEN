@@ -43,7 +43,8 @@ contract YEN is ERC20Burnable {
     uint256 public perStakeRewards;
 
     uint256 public constant shareTokens = 6800000 * 10**18;
-    uint256 public constant getBlocks = ((60 * 60 * 24) / 12) * 100;
+    // uint256 public constant getBlocks = ((60 * 60 * 24) / 12) * 100;
+    uint256 public constant getBlocks = (((60 * 60 * 24) / 12) / 24) * 100;
     uint256 public immutable shareEndBlock = block.number + ((60 * 60 * 24) / 12) / 24;
     // uint256 public immutable shareEndBlock = block.number + ((60 * 60 * 24) / 12) * 3;
     uint256 public shareEths;
@@ -95,7 +96,8 @@ contract YEN is ERC20Burnable {
 
     modifier _checkFeeMul() {
         unchecked {
-            if (transfers == 100) {
+            // if (transfers == 100) {
+            if (transfers == 3) {
                 lastFeeMul = getFeeMul();
                 transfers = 0;
                 last100TransferBlock = block.number;
