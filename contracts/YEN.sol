@@ -51,6 +51,8 @@ contract YEN is ERC20Burnable {
     uint256 public sharePairs;
 
     uint256 public constant feeAddBlock = (60 * 60) / 12;
+    // uint256 public constant maxTransfers = 100;
+    uint256 public constant maxTransfers = 3;
     uint256 public transfers;
     uint256 public last100TransferBlock;
     uint256 public lastFeeMul = 1;
@@ -96,8 +98,7 @@ contract YEN is ERC20Burnable {
 
     modifier _checkFeeMul() {
         unchecked {
-            // if (transfers == 100) {
-            if (transfers == 3) {
+            if (transfers == maxTransfers) {
                 lastFeeMul = getFeeMul();
                 transfers = 0;
                 last100TransferBlock = block.number;
