@@ -56,16 +56,8 @@ export class YENClient implements IYENClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
-  public async getFeeMul(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.getFeeMul({ ...config });
-  }
-
   public async blockMints(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.blockMints({ ...config });
-  }
-
-  public async getBlocks(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.getBlocks({ ...config });
   }
 
   public async getMints(config?: CallOverrides): Promise<BigNumber> {
@@ -91,35 +83,8 @@ export class YENClient implements IYENClient {
     return this._contract.lastBlock({ ...config });
   }
 
-  public async getShares(
-    sharer: string,
-    config?: CallOverrides
-  ): Promise<BigNumber> {
-    return this._contract.getShares(sharer, { ...config });
-  }
-
-  public async mintStartBlock(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.mintStartBlock({ ...config });
-  }
-
   public async perStakeRewards(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.perStakeRewards({ ...config });
-  }
-
-  public async shareEndBlock(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.shareEndBlock({ ...config });
-  }
-
-  public async shareEths(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.shareEths({ ...config });
-  }
-
-  public async sharePairs(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.sharePairs({ ...config });
-  }
-
-  public async shareTokens(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.shareTokens({ ...config });
   }
 
   public async stakes(config?: CallOverrides): Promise<BigNumber> {
@@ -138,13 +103,6 @@ export class YENClient implements IYENClient {
     config?: CallOverrides
   ): Promise<YENModel.Person> {
     return this._contract.personMap(person, { ...config });
-  }
-
-  public async sharerMap(
-    sharer: string,
-    config?: CallOverrides
-  ): Promise<YENModel.Sharer> {
-    return this._contract.sharerMap(sharer, { ...config });
   }
 
   public async getPersonBlockList(
@@ -197,39 +155,6 @@ export class YENClient implements IYENClient {
   }
 
   /* ================ TRANSACTION FUNCTIONS ================ */
-
-  public async share(
-    config?: PayableOverrides,
-    callback?: Function
-  ): Promise<void> {
-    this._beforeTransaction();
-    const transaction = await this._contract.share({
-      ...config
-    });
-    this._afterTransaction(transaction, callback);
-  }
-
-  public async start(
-    config?: PayableOverrides,
-    callback?: Function
-  ): Promise<void> {
-    this._beforeTransaction();
-    const transaction = await this._contract.start({
-      ...config
-    });
-    this._afterTransaction(transaction, callback);
-  }
-
-  public async getShare(
-    config?: PayableOverrides,
-    callback?: Function
-  ): Promise<void> {
-    this._beforeTransaction();
-    const transaction = await this._contract.getShare({
-      ...config
-    });
-    this._afterTransaction(transaction, callback);
-  }
 
   public async mint(
     config?: PayableOverrides,

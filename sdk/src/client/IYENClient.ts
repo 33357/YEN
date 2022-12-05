@@ -11,11 +11,7 @@ export interface IYENClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
-  getFeeMul(config?: CallOverrides): Promise<BigNumber>;
-
   blockMints(config?: CallOverrides): Promise<BigNumber>;
-
-  getBlocks(config?: CallOverrides): Promise<BigNumber>;
 
   getMints(config?: CallOverrides): Promise<BigNumber>;
 
@@ -27,20 +23,6 @@ export interface IYENClient {
 
   lastBlock(config?: CallOverrides): Promise<BigNumber>;
 
-  getShares(address: string, config?: CallOverrides): Promise<BigNumber>;
-
-  mintStartBlock(config?: CallOverrides): Promise<BigNumber>;
-
-  perStakeRewards(config?: CallOverrides): Promise<BigNumber>;
-
-  shareEndBlock(config?: CallOverrides): Promise<BigNumber>;
-
-  shareEths(config?: CallOverrides): Promise<BigNumber>;
-
-  sharePairs(config?: CallOverrides): Promise<BigNumber>;
-
-  shareTokens(config?: CallOverrides): Promise<BigNumber>;
-
   stakes(config?: CallOverrides): Promise<BigNumber>;
 
   blockMap(
@@ -49,8 +31,6 @@ export interface IYENClient {
   ): Promise<YENModel.Block>;
 
   personMap(person: string, config?: CallOverrides): Promise<YENModel.Person>;
-
-  sharerMap(sharer: string, config?: CallOverrides): Promise<YENModel.Sharer>;
 
   getPersonBlockList(person: string, config?: CallOverrides): Promise<number[]>;
 
@@ -75,12 +55,6 @@ export interface IYENClient {
   pair(config?: CallOverrides): Promise<string>;
 
   /* ================ TRANSACTION FUNCTIONS ================ */
-
-  share(config?: PayableOverrides, callback?: Function): Promise<void>;
-
-  start(config?: PayableOverrides, callback?: Function): Promise<void>;
-
-  getShare(config?: PayableOverrides, callback?: Function): Promise<void>;
 
   mint(config?: PayableOverrides, callback?: Function): Promise<void>;
 

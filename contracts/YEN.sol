@@ -27,19 +27,13 @@ contract YEN is ERC20Burnable {
 
     // uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 30;
     uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 1;
-    uint256 public lastBlock;
-    uint256 public halvingBlock;
+    uint256 public lastBlock = block.number;
+    uint256 public halvingBlock = lastBlock + halvingBlocks;
     uint256 public blockMints = 100 * 10**18;
 
     uint256 public stakes = 1;
     uint256 public perStakeRewards;
-
-    uint256 public constant feeAddBlock = (60 * 60) / 12;
-    // uint256 public constant maxTransfers = 100;
-    uint256 public constant maxTransfers = 1;
-    uint256 public transfers;
-    uint256 public last100TransferBlock;
-    uint256 public lastFeeMul = 1;
+    uint256 public fee = 1;
 
     // IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     IWETH public constant weth = IWETH(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6);
@@ -52,10 +46,7 @@ contract YEN is ERC20Burnable {
     mapping(uint256 => Block) public blockMap;
     mapping(address => Person) public personMap;
 
-    constructor() ERC20("YEN", "YEN") {
-        halvingBlock = block.number + halvingBlocks;
-        lastBlock = block.number;
-    }
+    constructor() ERC20("YEN", "YEN") {}
 
     /* ================ UTIL FUNCTIONS ================ */
 
@@ -77,19 +68,6 @@ contract YEN is ERC20Burnable {
         _;
     }
 
-    modifier _checkFeeMul() {
-        unchecked {
-            if (transfers == maxTransfers) {
-                lastFeeMul = _getThisFeeMul();
-                transfers = 0;
-                last100TransferBlock = block.number;
-            } else {
-                transfers++;
-            }
-        }
-        _;
-    }
-
     function _addPerStakeRewards(uint256 adds) internal {
         unchecked {
             perStakeRewards += adds / stakes;
@@ -100,7 +78,7 @@ contract YEN is ERC20Burnable {
         address sender,
         address recipient,
         uint256 amount
-    ) internal override _checkFeeMul {
+    ) internal override {
         unchecked {
             require(sender != address(0), "ERC20: transfer from the zero address");
             require(recipient != address(0), "ERC20: transfer to the zero address");
@@ -114,7 +92,7 @@ contract YEN is ERC20Burnable {
 
             uint256 fees;
             if (sender != address(this)) {
-                fees = (amount * getFeeMul()) / 1000;
+                fees = (amount * fee) / 1000;
                 _balances[address(this)] += fees;
                 emit Transfer(sender, address(this), fees);
                 uint256 burnFees = fees / 5;
@@ -130,23 +108,7 @@ contract YEN is ERC20Burnable {
         }
     }
 
-    function _getThisFeeMul() internal view returns (uint256) {
-        uint256 mul = (block.number - last100TransferBlock) / feeAddBlock;
-        if (mul > 9) {
-            mul = 9;
-        }
-        mul = 10 - mul;
-        return mul;
-    }
-
     /* ================ VIEW FUNCTIONS ================ */
-
-    function getFeeMul() public view returns (uint256) {
-        unchecked {
-            uint256 mul = _getThisFeeMul();
-            return mul < lastFeeMul ? mul : lastFeeMul;
-        }
-    }
 
     function getMints() public view returns (uint256) {
         unchecked {

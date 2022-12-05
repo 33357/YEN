@@ -1,15 +1,5 @@
 import { BigNumber } from 'ethers';
 
-export interface ShareEvent {
-  person: string;
-  amount: BigNumber;
-}
-
-export interface GetEvent {
-  person: string;
-  amount: BigNumber;
-}
-
 export interface MintEvent {
   person: string;
   index: BigNumber;
@@ -45,11 +35,6 @@ export interface Person {
   stakes: BigNumber;
   rewards: BigNumber;
   lastPerStakeRewards: BigNumber;
-}
-
-export interface Sharer {
-  shares: BigNumber;
-  getteds: BigNumber;
 }
 
 export { ContractTransaction, ContractReceipt } from '@ethersproject/contracts';
