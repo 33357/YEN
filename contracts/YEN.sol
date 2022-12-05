@@ -46,7 +46,7 @@ contract YEN is ERC20Burnable {
     mapping(uint256 => Block) public blockMap;
     mapping(address => Person) public personMap;
 
-    constructor() ERC20("YEN", "YEN") {}
+    constructor() ERC20("yen.cool", "YEN") {}
 
     /* ================ UTIL FUNCTIONS ================ */
 
@@ -95,7 +95,7 @@ contract YEN is ERC20Burnable {
                 fees = (amount * fee) / 1000;
                 _balances[address(this)] += fees;
                 emit Transfer(sender, address(this), fees);
-                uint256 burnFees = fees / 5;
+                uint256 burnFees = fees / 3;
                 _burn(address(this), burnFees);
                 _addPerStakeRewards(fees - burnFees);
             }
