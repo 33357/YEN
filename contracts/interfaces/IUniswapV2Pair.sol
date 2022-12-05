@@ -9,6 +9,4 @@ interface IUniswapV2Pair {
         address to,
         uint256 value
     ) external returns (bool);
-
-    function mint(address to) external returns (uint256 liquidity);
 }

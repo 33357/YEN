@@ -56,10 +56,6 @@ export class YENClient implements IYENClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
-  public async fee(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.fee({ ...config });
-  }
-
   public async blockMints(config?: CallOverrides): Promise<BigNumber> {
     return this._contract.blockMints({ ...config });
   }
