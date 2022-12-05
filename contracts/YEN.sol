@@ -33,7 +33,6 @@ contract YEN is ERC20Burnable {
 
     uint256 public stakes = 1;
     uint256 public perStakeRewards;
-    uint256 public immutable fee = 1;
 
     // IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     IWETH public constant weth = IWETH(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6);
@@ -92,12 +91,15 @@ contract YEN is ERC20Burnable {
 
             uint256 fees;
             if (sender != address(this)) {
-                fees = (amount * fee) / 1000;
-                _balances[address(this)] += fees;
-                emit Transfer(sender, address(this), fees);
+                fees = amount / 1000;
+
                 uint256 burnFees = fees / 3;
                 _burn(address(this), burnFees);
-                _addPerStakeRewards(fees - burnFees);
+
+                uint256 lpFees = fees - burnFees;
+                _balances[address(this)] += lpFees;
+                emit Transfer(sender, address(this), lpFees);
+                _addPerStakeRewards(lpFees);
             }
 
             uint256 recipients = amount - fees;
