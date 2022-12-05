@@ -11,6 +11,8 @@ export interface IYENClient {
 
   /* ================ VIEW FUNCTIONS ================ */
 
+  fee(config?: CallOverrides): Promise<BigNumber>;
+
   blockMints(config?: CallOverrides): Promise<BigNumber>;
 
   getMints(config?: CallOverrides): Promise<BigNumber>;

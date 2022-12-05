@@ -33,7 +33,7 @@ contract YEN is ERC20Burnable {
 
     uint256 public stakes = 1;
     uint256 public perStakeRewards;
-    uint256 public fee = 1;
+    uint256 public immutable fee = 1;
 
     // IWETH public constant weth = IWETH(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     IWETH public constant weth = IWETH(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6);
