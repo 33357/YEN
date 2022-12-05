@@ -33,7 +33,6 @@ contract YEN is ERC20Burnable {
     uint256 public stakes = 1;
     uint256 public perStakeRewards;
 
-
     IERC20 public immutable token = IERC20(address(this));
     //  IUniswapV2Pair public immutable pair =
     //     IUniswapV2Pair(
@@ -41,7 +40,10 @@ contract YEN is ERC20Burnable {
     //     );
     IUniswapV2Pair public immutable pair =
         IUniswapV2Pair(
-            IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6, address(this))
+            IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(
+                0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6,
+                address(this)
+            )
         );
 
     mapping(uint256 => Block) public blockMap;
@@ -52,11 +54,9 @@ contract YEN is ERC20Burnable {
     /* ================ UTIL FUNCTIONS ================ */
 
     modifier _checkHalving() {
-        unchecked {
-            if (block.number >= halvingBlock) {
-                blockMints /= 2;
-                halvingBlock += halvingBlocks;
-            }
+        if (block.number >= halvingBlock) {
+            blockMints /= 2;
+            halvingBlock += halvingBlocks;
         }
         _;
     }
@@ -118,15 +118,13 @@ contract YEN is ERC20Burnable {
     }
 
     function getClaims(address sender) public view returns (uint256) {
-        unchecked {
-            Person memory person = personMap[sender];
-            uint256 claims;
-            for (uint256 i = 0; i < person.blockIndex; i++) {
-                Block memory _block = blockMap[person.blockList[i]];
-                claims += _block.mints / _block.persons;
-            }
-            return claims;
+        Person memory person = personMap[sender];
+        uint256 claims;
+        for (uint256 i = 0; i < person.blockIndex; i++) {
+            Block memory _block = blockMap[person.blockList[i]];
+            claims += _block.mints / _block.persons;
         }
+        return claims;
     }
 
     function getRewards(address person) public view returns (uint256) {
@@ -139,75 +137,63 @@ contract YEN is ERC20Burnable {
     }
 
     function getPersonBlockList(address person) external view returns (uint32[] memory) {
-        unchecked {
-            uint32[] memory blockList = new uint32[](personMap[person].blockIndex);
-            for (uint256 i = 0; i < personMap[person].blockIndex; i++) {
-                blockList[i] = personMap[person].blockList[i];
-            }
-            return blockList;
+        uint32[] memory blockList = new uint32[](personMap[person].blockIndex);
+        for (uint256 i = 0; i < personMap[person].blockIndex; i++) {
+            blockList[i] = personMap[person].blockList[i];
         }
+        return blockList;
     }
 
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function mint() external _checkHalving {
-        unchecked {
-            if (block.number != lastBlock) {
-                uint256 mints = getMints();
-                _mint(address(this), mints);
-                blockMap[block.number].mints = uint128(mints / 2);
-                lastBlock = block.number;
-                _addPerStakeRewards(blockMap[block.number].mints);
-            }
-            Person storage person = personMap[msg.sender];
-            if (person.blockList.length == person.blockIndex) {
-                person.blockList.push(uint32(block.number));
-            } else {
-                person.blockList[person.blockIndex] = uint32(block.number);
-            }
-            emit Mint(msg.sender, blockMap[block.number].persons);
-            blockMap[block.number].persons++;
-            person.blockIndex++;
+        if (block.number != lastBlock) {
+            uint256 mints = getMints();
+            _mint(address(this), mints);
+            blockMap[block.number].mints = uint128(mints / 2);
+            lastBlock = block.number;
+            _addPerStakeRewards(blockMap[block.number].mints);
         }
+        Person storage person = personMap[msg.sender];
+        if (person.blockList.length == person.blockIndex) {
+            person.blockList.push(uint32(block.number));
+        } else {
+            person.blockList[person.blockIndex] = uint32(block.number);
+        }
+        emit Mint(msg.sender, blockMap[block.number].persons);
+        blockMap[block.number].persons++;
+        person.blockIndex++;
     }
 
     function claim() external {
-        unchecked {
-            Person memory person = personMap[msg.sender];
-            require(person.blockList[person.blockIndex - 1] != block.number, "mint claim cannot in sample block!");
-            uint256 claims = getClaims(msg.sender);
-            personMap[msg.sender].blockIndex = 0;
-            token.transfer(msg.sender, claims);
-            emit Claim(msg.sender, claims);
-        }
+        Person memory person = personMap[msg.sender];
+        require(person.blockList[person.blockIndex - 1] != block.number, "mint claim cannot in sample block!");
+        uint256 claims = getClaims(msg.sender);
+        personMap[msg.sender].blockIndex = 0;
+        token.transfer(msg.sender, claims);
+        emit Claim(msg.sender, claims);
     }
 
     function stake(uint256 amount) external _checkReward {
-        unchecked {
-            pair.transferFrom(msg.sender, address(this), amount);
-            personMap[msg.sender].stakes += uint128(amount);
-            stakes += amount;
-            emit Stake(msg.sender, amount);
-        }
+        pair.transferFrom(msg.sender, address(this), amount);
+        personMap[msg.sender].stakes += uint128(amount);
+        stakes += amount;
+        emit Stake(msg.sender, amount);
     }
 
     function withdrawStake(uint256 amount) public _checkReward {
-        unchecked {
-            require(amount <= personMap[msg.sender].stakes, "amount cannot over stakes!");
-            personMap[msg.sender].stakes -= uint128(amount);
-            stakes -= amount;
-            pair.transfer(msg.sender, amount);
-            emit WithdrawStake(msg.sender, amount);
-        }
+        require(amount <= personMap[msg.sender].stakes, "amount cannot over stakes!");
+        personMap[msg.sender].stakes -= uint128(amount);
+        stakes -= amount;
+        pair.transfer(msg.sender, amount);
+        emit WithdrawStake(msg.sender, amount);
     }
 
     function withdrawReward() public _checkReward {
-        unchecked {
-            uint256 rewards = personMap[msg.sender].rewards;
-            personMap[msg.sender].rewards = 0;
-            token.transfer(msg.sender, rewards);
-            emit WithdrawReward(msg.sender, rewards);
-        }
+        uint256 rewards = personMap[msg.sender].rewards;
+        personMap[msg.sender].rewards = 0;
+        token.transfer(msg.sender, rewards);
+        emit WithdrawReward(msg.sender, rewards);
     }
 
     function exit() external {
