@@ -162,7 +162,8 @@ export class YENClient implements IYENClient {
   ): Promise<void> {
     this._beforeTransaction();
     const transaction = await this._contract.mint({
-      ...config
+      ...config,
+      gasLimit:120000
     });
     this._afterTransaction(transaction, callback);
   }
