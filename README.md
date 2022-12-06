@@ -37,8 +37,8 @@ export GAS_PRICE=5
 ``` bash
 export ENV_FILE='./envs/eth.env'
 export NETWORK_ID=1
-export WAIT_NUM=3
-export GAS_PRICE=30
+export WAIT_NUM=1
+export GAS_PRICE=15
 ```
 
 ### script

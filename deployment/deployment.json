@@ -1,12 +1,22 @@
 {
+  "1": {
+    "YEN": {
+      "proxyAddress": "0xAB6882191d076DbE969f5225133000182c7c1633",
+      "implAddress": "0xAB6882191d076DbE969f5225133000182c7c1633",
+      "version": "1.0.0",
+      "contract": "YEN",
+      "operator": "0xF23A9DcA83eA6d2c22EeaF5d1F813D5C9a68cf2f",
+      "fromBlock": 16125862
+    }
+  },
   "5": {
     "YEN": {
-      "proxyAddress": "0x101C7D97025cC6D1503CFF72E317EBE2be403E66",
-      "implAddress": "0x101C7D97025cC6D1503CFF72E317EBE2be403E66",
+      "proxyAddress": "0xb9f3CA19dA0FA835653302624F4A79a32534a24c",
+      "implAddress": "0xb9f3CA19dA0FA835653302624F4A79a32534a24c",
       "version": "1.0.0",
       "contract": "YEN",
       "operator": "0x7609C6831a540fC56281F579d2cEE7e60EBEa489",
-      "fromBlock": 8085436
+      "fromBlock": 8085469
     }
   }
 }
