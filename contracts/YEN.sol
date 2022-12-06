@@ -74,7 +74,7 @@ contract YEN is ERC20Burnable {
 
     function _addPerStakeRewards(uint256 adds) internal {
         unchecked {
-            perStakeRewards += (adds * 10**18) / stakes;
+            perStakeRewards += (adds * 10**8) / stakes;
         }
     }
 
@@ -134,7 +134,7 @@ contract YEN is ERC20Burnable {
         unchecked {
             return
                 (personMap[person].stakes * (perStakeRewards - personMap[person].lastPerStakeRewards)) /
-                10**18 +
+                10**8 +
                 personMap[person].rewards;
         }
     }
