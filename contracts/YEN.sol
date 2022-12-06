@@ -24,8 +24,8 @@ contract YEN is ERC20Burnable {
         uint160 lastPerStakeRewards;
     }
 
-    // uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 30;
-    uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 1;
+    uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 30;
+    // uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 1;
     uint256 public lastBlock = block.number;
     uint256 public halvingBlock = lastBlock + halvingBlocks;
     uint256 public blockMints = 100 * 10**18;
@@ -34,20 +34,20 @@ contract YEN is ERC20Burnable {
     uint256 public perStakeRewards;
 
     IERC20 public immutable token = IERC20(address(this));
-    // IUniswapV2Pair public immutable pair =
-    //     IUniswapV2Pair(
-    //         IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(
-    //             0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,
-    //             address(this)
-    //         )
-    //     );
     IUniswapV2Pair public immutable pair =
         IUniswapV2Pair(
             IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(
-                0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6,
+                0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2,
                 address(this)
             )
         );
+    // IUniswapV2Pair public immutable pair =
+    //     IUniswapV2Pair(
+    //         IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f).createPair(
+    //             0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6,
+    //             address(this)
+    //         )
+    //     );
 
     mapping(uint256 => Block) public blockMap;
     mapping(address => Person) public personMap;
