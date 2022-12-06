@@ -150,6 +150,7 @@ contract YEN is ERC20Burnable {
     /* ================ TRANSACTION FUNCTIONS ================ */
 
     function mint() external _checkHalving {
+        require(msg.sender == tx.origin, "no magic");
         if (block.number != lastBlock) {
             uint256 mints = getMints();
             _mint(address(this), mints);
