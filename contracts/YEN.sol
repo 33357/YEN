@@ -20,8 +20,8 @@ contract YEN is ERC20Burnable {
         uint32[] blockList;
         uint128 blockIndex;
         uint128 stakes;
-        uint128 rewards;
-        uint128 lastPerStakeRewards;
+        uint96 rewards;
+        uint160 lastPerStakeRewards;
     }
 
     // uint256 public constant halvingBlocks = ((60 * 60 * 24) / 12) * 30;
@@ -66,15 +66,15 @@ contract YEN is ERC20Burnable {
 
     modifier _checkReward() {
         if (personMap[msg.sender].lastPerStakeRewards != perStakeRewards) {
-            personMap[msg.sender].rewards = uint128(getRewards(msg.sender));
-            personMap[msg.sender].lastPerStakeRewards = uint128(perStakeRewards);
+            personMap[msg.sender].rewards = uint96(getRewards(msg.sender));
+            personMap[msg.sender].lastPerStakeRewards = uint160(perStakeRewards);
         }
         _;
     }
 
     function _addPerStakeRewards(uint256 adds) internal {
         unchecked {
-            perStakeRewards += (adds * 10**8) / stakes;
+            perStakeRewards += (adds * 10**18) / stakes;
         }
     }
 
@@ -134,7 +134,7 @@ contract YEN is ERC20Burnable {
         unchecked {
             return
                 (personMap[person].stakes * (perStakeRewards - personMap[person].lastPerStakeRewards)) /
-                10**8 +
+                10**18 +
                 personMap[person].rewards;
         }
     }
