@@ -12,7 +12,7 @@ import { IYENClient } from '.';
 import { YEN, YEN__factory } from '../typechain';
 
 export class YENClient implements IYENClient {
-  private _contract: YEN;
+  public yen: YEN;
   private _errorTitle = 'YENClient';
   private _provider: Provider | Signer;
   private _waitConfirmations = 1;
@@ -26,11 +26,11 @@ export class YENClient implements IYENClient {
       this._waitConfirmations = waitConfirmations;
     }
     this._provider = provider;
-    this._contract = YEN__factory.connect(address, this._provider);
+    this.yen = YEN__factory.connect(address, this._provider);
   }
 
   public address(): string {
-    return this._contract.address;
+    return this.yen.address;
   }
 
   /* ================ UTILS FUNCTIONS ================ */
@@ -46,7 +46,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<any> {
     if (callback) {
-      callback(transaction);
+      callback(transaction);this.yen
     }
     const receipt = await transaction.wait(this._waitConfirmations);
     if (callback) {
@@ -57,89 +57,89 @@ export class YENClient implements IYENClient {
   /* ================ VIEW FUNCTIONS ================ */
 
   public async blockMints(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.blockMints({ ...config });
+    return this.yen.blockMints({ ...config });
   }
 
   public async getMints(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.getMints({ ...config });
+    return this.yen.getMints({ ...config });
   }
 
   public async getRewards(
     address: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.getRewards(address, { ...config });
+    return this.yen.getRewards(address, { ...config });
   }
 
   public async halvingBlock(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.halvingBlock({ ...config });
+    return this.yen.halvingBlock({ ...config });
   }
 
   public async halvingBlocks(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.halvingBlocks({ ...config });
+    return this.yen.halvingBlocks({ ...config });
   }
 
   public async lastBlock(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.lastBlock({ ...config });
+    return this.yen.lastBlock({ ...config });
   }
 
   public async perStakeRewards(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.perStakeRewards({ ...config });
+    return this.yen.perStakeRewards({ ...config });
   }
 
   public async stakes(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.stakes({ ...config });
+    return this.yen.stakes({ ...config });
   }
 
   public async blockMap(
     blockNumber: BigNumberish,
     config?: CallOverrides
   ): Promise<YENModel.Block> {
-    return this._contract.blockMap(blockNumber, { ...config });
+    return this.yen.blockMap(blockNumber, { ...config });
   }
 
   public async personMap(
     person: string,
     config?: CallOverrides
   ): Promise<YENModel.Person> {
-    return this._contract.personMap(person, { ...config });
+    return this.yen.personMap(person, { ...config });
   }
 
   public async getPersonBlockList(
     person: string,
     config?: CallOverrides
   ): Promise<number[]> {
-    return this._contract.getPersonBlockList(person, { ...config });
+    return this.yen.getPersonBlockList(person, { ...config });
   }
 
   public async getClaims(
     person: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.getClaims(person, { ...config });
+    return this.yen.getClaims(person, { ...config });
   }
 
   public async name(config?: CallOverrides): Promise<string> {
-    return this._contract.name({ ...config });
+    return this.yen.name({ ...config });
   }
 
   public async symbol(config?: CallOverrides): Promise<string> {
-    return this._contract.symbol({ ...config });
+    return this.yen.symbol({ ...config });
   }
 
   public async decimals(config?: CallOverrides): Promise<number> {
-    return this._contract.decimals({ ...config });
+    return this.yen.decimals({ ...config });
   }
 
   public async totalSupply(config?: CallOverrides): Promise<BigNumber> {
-    return this._contract.totalSupply({ ...config });
+    return this.yen.totalSupply({ ...config });
   }
 
   public async balanceOf(
     account: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.balanceOf(account, { ...config });
+    return this.yen.balanceOf(account, { ...config });
   }
 
   public async allowance(
@@ -147,11 +147,11 @@ export class YENClient implements IYENClient {
     spender: string,
     config?: CallOverrides
   ): Promise<BigNumber> {
-    return this._contract.allowance(owner, spender, { ...config });
+    return this.yen.allowance(owner, spender, { ...config });
   }
 
   public async pair(config?: CallOverrides): Promise<string> {
-    return this._contract.pair({ ...config });
+    return this.yen.pair({ ...config });
   }
 
   /* ================ TRANSACTION FUNCTIONS ================ */
@@ -161,7 +161,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.mint({
+    const transaction = await this.yen.mint({
       ...config,
       gasLimit:200000
     });
@@ -173,7 +173,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.claim({
+    const transaction = await this.yen.claim({
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -185,7 +185,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.stake(amount, {
+    const transaction = await this.yen.stake(amount, {
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -197,7 +197,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.withdrawStake(amount, {
+    const transaction = await this.yen.withdrawStake(amount, {
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -208,7 +208,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.withdrawReward({
+    const transaction = await this.yen.withdrawReward({
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -219,7 +219,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.exit({
+    const transaction = await this.yen.exit({
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -232,7 +232,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.transfer(recipient, amount, {
+    const transaction = await this.yen.transfer(recipient, amount, {
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -245,7 +245,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.approve(spender, amount, {
+    const transaction = await this.yen.approve(spender, amount, {
       ...config
     });
     this._afterTransaction(transaction, callback);
@@ -259,7 +259,7 @@ export class YENClient implements IYENClient {
     callback?: Function
   ): Promise<void> {
     this._beforeTransaction();
-    const transaction = await this._contract.transferFrom(
+    const transaction = await this.yen.transferFrom(
       sender,
       recipient,
       amount,
